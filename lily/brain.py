@@ -5,7 +5,9 @@ from collections.abc import Iterator
 import ollama
 
 from .config import MODEL, OLLAMA_HOST
+from .log import get_logger
 
+log = get_logger("brain")
 _client = ollama.Client(host=OLLAMA_HOST)
 
 
@@ -33,11 +35,14 @@ def stream_chat(messages: list[dict]) -> Iterator[str]:
                 yield piece
     except ollama.ResponseError as exc:
         if "not found" in str(exc).lower():
+            log.error("model %s not pulled: %s", MODEL, exc)
             raise BrainOffline(
                 f"Model '{MODEL}' isn't pulled. Run:  ollama pull {MODEL}"
             ) from exc
+        log.error("ollama response error: %s", exc)
         raise BrainOffline(str(exc)) from exc
-    except (ConnectionError, ollama.RequestError) as exc:
+    except Exception as exc:  # connection refused, timeout, transport errors...
+        log.error("cannot reach ollama at %s: %s", OLLAMA_HOST, exc)
         raise BrainOffline(
             f"Can't reach Ollama at {OLLAMA_HOST}. Is it running?  (ollama serve)"
         ) from exc

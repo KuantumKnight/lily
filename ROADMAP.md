@@ -22,7 +22,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] P3  Conversation memory (SQLite) — she remembers within a session
 - [x] P4  CLI REPL — talk to Lily in the terminal *(← ALIVE)*
 - [x] P5  Config system (model, host, paths via env + file)
-- [ ] P6  Logging + graceful errors (Ollama down, model missing)
+- [x] P6  Logging + graceful errors (Ollama down, model missing)
 
 ### Give her senses & hands
 - [ ] P7  Tool framework — let Lily call local functions

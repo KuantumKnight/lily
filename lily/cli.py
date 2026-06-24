@@ -4,9 +4,11 @@ from rich.console import Console
 
 from . import brain, memory
 from .config import CONTEXT_WINDOW, MODEL
+from .log import get_logger
 from .persona import PERSONA
 
 console = Console()
+log = get_logger("cli")
 
 EXIT_WORDS = {"exit", "quit", "bye", "sleep"}
 
@@ -17,6 +19,7 @@ def _build_context(user_input: str) -> list[dict]:
 
 
 def main() -> None:
+    log.info("Lily session started (model=%s)", MODEL)
     console.print(
         f"[bold magenta]Lily[/] is awake. "
         f"[dim](brain: {MODEL} · type 'exit' to sleep)[/]\n"
@@ -47,6 +50,7 @@ def main() -> None:
         console.print()
         memory.remember("assistant", reply)
 
+    log.info("Lily session ended")
     console.print("\n[dim]Lily: resting. 🌙[/]")
 
 
