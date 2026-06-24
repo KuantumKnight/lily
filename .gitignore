@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Lily runtime data (her memory lives here — never commit it)
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets / local config
+.env
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Models / large artifacts
+*.gguf
+*.onnx
