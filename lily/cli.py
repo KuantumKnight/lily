@@ -2,7 +2,7 @@
 
 from rich.console import Console
 
-from . import brain, engine, memory, tools
+from . import brain, engine, memory, scheduler, tools
 from .config import CONTEXT_WINDOW, MODEL
 from .log import get_logger
 from .persona import PERSONA
@@ -18,35 +18,46 @@ def _build_context(user_input: str) -> list[dict]:
     return [{"role": "system", "content": PERSONA}, *memory.recent(CONTEXT_WINDOW)]
 
 
+def _print_reminder(row) -> None:
+    due = f" [dim]({row['due_at']})[/]" if row["due_at"] else ""
+    console.print(f"\n[bold yellow]reminder ›[/] {row['content']}{due}")
+
+
 def main() -> None:
     tools.load_builtins()
+    reminder_scheduler = scheduler.start_reminder_scheduler(_print_reminder)
     log.info("Lily session started (model=%s)", MODEL)
     console.print(
         f"[bold magenta]Lily[/] is awake. "
         f"[dim](brain: {MODEL} · type 'exit' to sleep)[/]\n"
     )
-    while True:
-        try:
-            user_input = console.input("[bold cyan]you ›[/] ").strip()
-        except (EOFError, KeyboardInterrupt):
-            break
+    try:
+        while True:
+            try:
+                user_input = console.input("[bold cyan]you ›[/] ").strip()
+            except (EOFError, KeyboardInterrupt):
+                break
 
-        if not user_input:
-            continue
-        if user_input.lower() in EXIT_WORDS:
-            break
+            if not user_input:
+                continue
+            if user_input.lower() in EXIT_WORDS:
+                break
 
-        messages = _build_context(user_input)
+            messages = _build_context(user_input)
 
-        try:
-            with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
-                reply = engine.converse(messages)
-        except brain.BrainOffline as exc:
-            console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
-            continue
+            try:
+                with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
+                    reply = engine.converse(messages)
+            except brain.BrainOffline as exc:
+                console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
+                continue
 
-        console.print(f"[bold magenta]lily ›[/] {reply}")
-        memory.remember("assistant", reply)
+            console.print(f"[bold magenta]lily ›[/] {reply}")
+            memory.remember("assistant", reply)
+    finally:
+        if reminder_scheduler is not None:
+            reminder_scheduler.shutdown(wait=False)
+            log.info("reminder scheduler stopped")
 
     log.info("Lily session ended")
     console.print("\n[dim]Lily: resting. 🌙[/]")

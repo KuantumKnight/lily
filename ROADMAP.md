@@ -26,9 +26,9 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 
 ### Give her senses & hands
 - [x] P7  Tool framework — let Lily call local functions
-- [ ] P8  System telemetry tool (psutil: CPU/GPU/RAM/battery/temp)
-- [ ] P9  Notes & reminders tool (SQLite-backed)
-- [ ] P10 Scheduler (APScheduler) — timed reminders fire
+- [x] P8  System telemetry tool (psutil: CPU/GPU/RAM/battery/temp)
+- [x] P9  Notes & reminders tool (SQLite-backed)
+- [x] P10 Scheduler (APScheduler) — timed reminders fire
 - [ ] P11 Long-term memory — facts/preferences she recalls across sessions
 - [ ] P12 Rich TUI polish (panels, markdown rendering, status line)
 - [ ] P13 Daily brief command ("Lily, what's up today?")
