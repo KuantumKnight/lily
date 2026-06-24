@@ -29,10 +29,10 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] P8  System telemetry tool (psutil: CPU/GPU/RAM/battery/temp)
 - [x] P9  Notes & reminders tool (SQLite-backed)
 - [x] P10 Scheduler (APScheduler) — timed reminders fire
-- [ ] P11 Long-term memory — facts/preferences she recalls across sessions
-- [ ] P12 Rich TUI polish (panels, markdown rendering, status line)
-- [ ] P13 Daily brief command ("Lily, what's up today?")
-- [ ] P14 `lily` launcher script + first-run setup (model pull check)
+- [x] P11 Long-term memory — facts/preferences she recalls across sessions
+- [x] P12 Rich TUI polish (panels, markdown rendering, status line)
+- [x] P13 Daily brief command ("Lily, what's up today?")
+- [x] P14 `lily` launcher script + first-run setup (model pull check)
 
 ---
 

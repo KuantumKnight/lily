@@ -22,6 +22,16 @@ def _conn() -> sqlite3.Connection:
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS facts (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_ts REAL NOT NULL,
+            kind       TEXT NOT NULL,
+            content    TEXT NOT NULL
+        )
+        """
+    )
     return conn
 
 
@@ -53,3 +63,61 @@ def forget_all() -> None:
     with conn:
         conn.execute("DELETE FROM messages")
     conn.close()
+
+
+def remember_fact(content: str, kind: str = "fact") -> int:
+    """Persist a durable user fact or preference."""
+    conn = _conn()
+    with conn:
+        cur = conn.execute(
+            "INSERT INTO facts (created_ts, kind, content) VALUES (?, ?, ?)",
+            (time.time(), kind.strip() or "fact", content.strip()),
+        )
+    conn.close()
+    return int(cur.lastrowid)
+
+
+def list_facts(limit: int = 20, query: str = "") -> list[dict]:
+    """Return durable facts, newest first, optionally filtered by text."""
+    limit = max(1, min(int(limit), 100))
+    conn = _conn()
+    conn.row_factory = sqlite3.Row
+    if query.strip():
+        rows = conn.execute(
+            """
+            SELECT id, kind, content
+            FROM facts
+            WHERE content LIKE ?
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (f"%{query.strip()}%", limit),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT id, kind, content FROM facts ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
+def forget_fact(fact_id: int) -> bool:
+    """Delete one durable fact by id."""
+    conn = _conn()
+    with conn:
+        cur = conn.execute("DELETE FROM facts WHERE id = ?", (int(fact_id),))
+    conn.close()
+    return cur.rowcount > 0
+
+
+def long_term_context(limit: int = 12) -> str:
+    """Compact facts block for the system prompt."""
+    facts = list_facts(limit=limit)
+    if not facts:
+        return ""
+
+    lines = ["Long-term memory facts and preferences:"]
+    for fact in reversed(facts):
+        lines.append(f"- [{fact['kind']}] {fact['content']}")
+    return "\n".join(lines)

@@ -1,8 +1,10 @@
 """The terminal REPL — talk to Lily. This is where she comes alive."""
 
 from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
 
-from . import brain, engine, memory, scheduler, tools
+from . import brain, brief, engine, first_run, memory, scheduler, tools
 from .config import CONTEXT_WINDOW, MODEL
 from .log import get_logger
 from .persona import PERSONA
@@ -11,11 +13,16 @@ console = Console()
 log = get_logger("cli")
 
 EXIT_WORDS = {"exit", "quit", "bye", "sleep"}
+BRIEF_WORDS = {"brief", "daily brief", "what's up today", "whats up today"}
 
 
 def _build_context(user_input: str) -> list[dict]:
     memory.remember("user", user_input)
-    return [{"role": "system", "content": PERSONA}, *memory.recent(CONTEXT_WINDOW)]
+    system_prompt = PERSONA
+    facts = memory.long_term_context()
+    if facts:
+        system_prompt = f"{system_prompt}\n\n{facts}"
+    return [{"role": "system", "content": system_prompt}, *memory.recent(CONTEXT_WINDOW)]
 
 
 def _print_reminder(row) -> None:
@@ -23,14 +30,24 @@ def _print_reminder(row) -> None:
     console.print(f"\n[bold yellow]reminder ›[/] {row['content']}{due}")
 
 
+def _print_reply(reply: str) -> None:
+    console.print(Panel(Markdown(reply or "..."), title="Lily", border_style="magenta"))
+
+
 def main() -> None:
     tools.load_builtins()
+    setup_warnings = first_run.check_runtime()
     reminder_scheduler = scheduler.start_reminder_scheduler(_print_reminder)
     log.info("Lily session started (model=%s)", MODEL)
+    console.print(Panel.fit("[bold magenta]Lily[/] is awake", border_style="magenta"))
     console.print(
-        f"[bold magenta]Lily[/] is awake. "
-        f"[dim](brain: {MODEL} · type 'exit' to sleep)[/]\n"
+        f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
+        "type 'exit' to sleep | type 'brief' for today[/]\n"
     )
+    for warning in setup_warnings:
+        console.print(f"[yellow]setup ›[/] {warning}")
+    if setup_warnings:
+        console.print()
     try:
         while True:
             try:
@@ -42,6 +59,9 @@ def main() -> None:
                 continue
             if user_input.lower() in EXIT_WORDS:
                 break
+            if user_input.lower() in BRIEF_WORDS:
+                _print_reply(brief.daily_brief())
+                continue
 
             messages = _build_context(user_input)
 
@@ -52,7 +72,7 @@ def main() -> None:
                 console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
                 continue
 
-            console.print(f"[bold magenta]lily ›[/] {reply}")
+            _print_reply(reply)
             memory.remember("assistant", reply)
     finally:
         if reminder_scheduler is not None:

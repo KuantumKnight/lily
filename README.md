@@ -28,6 +28,9 @@ pip install -r requirements.txt
 
 # 3. wake her up
 python -m lily
+
+# Windows shortcut after setup
+.\lily.ps1
 ```
 
 ```
@@ -36,6 +39,10 @@ Lily is awake. Type 'exit' to sleep.
 you › hey Lily, who are you?
 lily › ...
 ```
+
+Lily runs first-start checks for installed Python packages, Ollama reachability, and
+whether the configured model is pulled. Inside the REPL, type `brief` for a local daily
+brief with system status, reminders, notes, and remembered facts.
 
 ## Configuration
 
