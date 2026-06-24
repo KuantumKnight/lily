@@ -1,0 +1,15 @@
+# Lily configuration — copy to `lily.toml` and edit. All keys are optional.
+# Environment variables (LILY_MODEL, LILY_OLLAMA_HOST, ...) override anything here.
+
+[lily]
+# Which local Ollama model is Lily's brain.
+model = "qwen3:8b"
+
+# Where the Ollama server lives.
+ollama_host = "http://localhost:11434"
+
+# How many recent messages to feed back as conversational context.
+context_window = 20
+
+# Logging verbosity: DEBUG | INFO | WARNING | ERROR
+log_level = "INFO"

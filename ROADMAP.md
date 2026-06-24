@@ -21,7 +21,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] P2  Persona — Lily's voice/personality system prompt
 - [x] P3  Conversation memory (SQLite) — she remembers within a session
 - [x] P4  CLI REPL — talk to Lily in the terminal *(← ALIVE)*
-- [ ] P5  Config system (model, host, paths via env + file)
+- [x] P5  Config system (model, host, paths via env + file)
 - [ ] P6  Logging + graceful errors (Ollama down, model missing)
 
 ### Give her senses & hands

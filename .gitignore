@@ -15,6 +15,7 @@ data/
 # Secrets / local config
 .env
 *.key
+lily.toml
 
 # OS / editor
 .DS_Store

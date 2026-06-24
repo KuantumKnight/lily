@@ -1,20 +1,59 @@
-"""Central configuration for Lily. Override anything via environment variables."""
+"""Central configuration for Lily.
+
+Precedence (highest first):  environment variable  >  config file  >  built-in default.
+
+Config file is TOML, looked up at ``lily.toml`` in the repo root (override the path with
+``LILY_CONFIG``). See ``lily.example.toml`` for the format. Everything has a sane default,
+so Lily runs with no config file at all.
+"""
 
 import os
+import tomllib
 from pathlib import Path
 
 # Repo root = parent of the `lily` package directory.
 ROOT = Path(__file__).resolve().parent.parent
 
-# Runtime data (her memory). Gitignored — never leaves the machine.
+# Runtime data (her memory + logs). Gitignored — never leaves the machine.
 DATA_DIR = ROOT / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
 DB_PATH = DATA_DIR / "lily.db"
+LOG_PATH = DATA_DIR / "lily.log"
 
-# Brain
-OLLAMA_HOST = os.environ.get("LILY_OLLAMA_HOST", "http://localhost:11434")
-MODEL = os.environ.get("LILY_MODEL", "qwen3:8b")
+CONFIG_PATH = Path(os.environ.get("LILY_CONFIG", ROOT / "lily.toml"))
 
-# How many recent messages to feed back as conversational context.
-CONTEXT_WINDOW = int(os.environ.get("LILY_CONTEXT_WINDOW", "20"))
+_DEFAULTS: dict = {
+    "model": "qwen3:8b",
+    "ollama_host": "http://localhost:11434",
+    "context_window": 20,
+    "log_level": "INFO",
+}
+
+
+def _load_file() -> dict:
+    if CONFIG_PATH.exists():
+        with open(CONFIG_PATH, "rb") as fh:
+            data = tomllib.load(fh)
+        # Accept either a top-level table or a [lily] section.
+        return data.get("lily", data)
+    return {}
+
+
+_FILE = _load_file()
+
+
+def _get(key: str, cast=str):
+    """Resolve one setting through the precedence chain."""
+    env = os.environ.get("LILY_" + key.upper())
+    if env is not None:
+        return cast(env)
+    if key in _FILE:
+        return cast(_FILE[key])
+    return _DEFAULTS[key]
+
+
+MODEL = _get("model")
+OLLAMA_HOST = _get("ollama_host")
+CONTEXT_WINDOW = _get("context_window", int)
+LOG_LEVEL = _get("log_level")
