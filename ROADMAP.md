@@ -25,7 +25,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] P6  Logging + graceful errors (Ollama down, model missing)
 
 ### Give her senses & hands
-- [ ] P7  Tool framework — let Lily call local functions
+- [x] P7  Tool framework — let Lily call local functions
 - [ ] P8  System telemetry tool (psutil: CPU/GPU/RAM/battery/temp)
 - [ ] P9  Notes & reminders tool (SQLite-backed)
 - [ ] P10 Scheduler (APScheduler) — timed reminders fire

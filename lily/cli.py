@@ -2,7 +2,7 @@
 
 from rich.console import Console
 
-from . import brain, memory
+from . import brain, engine, memory, tools
 from .config import CONTEXT_WINDOW, MODEL
 from .log import get_logger
 from .persona import PERSONA
@@ -19,6 +19,7 @@ def _build_context(user_input: str) -> list[dict]:
 
 
 def main() -> None:
+    tools.load_builtins()
     log.info("Lily session started (model=%s)", MODEL)
     console.print(
         f"[bold magenta]Lily[/] is awake. "
@@ -37,17 +38,14 @@ def main() -> None:
 
         messages = _build_context(user_input)
 
-        console.print("[bold magenta]lily ›[/] ", end="")
-        reply = ""
         try:
-            for token in brain.stream_chat(messages):
-                console.print(token, end="")
-                reply += token
+            with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
+                reply = engine.converse(messages)
         except brain.BrainOffline as exc:
-            console.print(f"\n[bold red]✗ Lily's brain is offline:[/] {exc}")
+            console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
             continue
 
-        console.print()
+        console.print(f"[bold magenta]lily ›[/] {reply}")
         memory.remember("assistant", reply)
 
     log.info("Lily session ended")
