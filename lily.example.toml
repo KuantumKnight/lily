@@ -5,6 +5,9 @@
 # Which local Ollama model is Lily's brain.
 model = "qwen3:8b"
 
+# Local embedding model for semantic recall (ollama pull nomic-embed-text).
+embed_model = "nomic-embed-text"
+
 # Where the Ollama server lives.
 ollama_host = "http://localhost:11434"
 

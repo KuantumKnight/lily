@@ -68,4 +68,15 @@ def execute(name: str, args: dict | None) -> str:
 
 def load_builtins() -> None:
     """Import the modules that register Lily's built-in tools."""
-    from . import brief, builtin, facts, habits, notes, projects, stt, system, tts  # noqa: F401
+    from . import (  # noqa: F401
+        brief,
+        builtin,
+        facts,
+        habits,
+        notes,
+        projects,
+        recall,
+        stt,
+        system,
+        tts,
+    )

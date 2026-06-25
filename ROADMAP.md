@@ -51,7 +51,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] E7  Planner agent (multi-step task decomposition)
 - [x] E8  Memory layers: project memory
 - [x] E9  Memory layers: behavior memory (habits, work hours)
-- [ ] E10 Vector recall (sqlite-vec embeddings + semantic search)
+- [x] E10 Vector recall (sqlite-vec embeddings + semantic search)
 
 ### Modes & interrupts
 - [ ] E11 Passive / Active mode switching

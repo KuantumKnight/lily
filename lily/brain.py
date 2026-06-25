@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 import ollama
 
-from .config import MODEL, OLLAMA_HOST
+from .config import EMBED_MODEL, MODEL, OLLAMA_HOST
 from .log import get_logger
 
 log = get_logger("brain")
@@ -13,6 +13,31 @@ _client = ollama.Client(host=OLLAMA_HOST)
 
 class BrainOffline(Exception):
     """Raised when the local model can't be reached or used."""
+
+
+def embed(text: str) -> list[float]:
+    """Return an embedding vector for ``text`` via the local embedding model.
+
+    Raises BrainOffline if Ollama is unreachable or the embed model isn't pulled.
+    """
+    try:
+        response = _client.embed(model=EMBED_MODEL, input=text)
+        vectors = response.get("embeddings") or []
+        return list(vectors[0]) if vectors else []
+    except AttributeError:
+        # Older ollama clients expose embeddings() returning a single vector.
+        response = _client.embeddings(model=EMBED_MODEL, prompt=text)
+        return list(response.get("embedding") or [])
+    except ollama.ResponseError as exc:
+        if "not found" in str(exc).lower():
+            raise BrainOffline(
+                f"Embedding model '{EMBED_MODEL}' isn't pulled. Run:  ollama pull {EMBED_MODEL}"
+            ) from exc
+        raise BrainOffline(str(exc)) from exc
+    except Exception as exc:
+        raise BrainOffline(
+            f"Can't reach Ollama at {OLLAMA_HOST} for embeddings. Is it running?"
+        ) from exc
 
 
 def _prepare(messages: list[dict]) -> list[dict]:

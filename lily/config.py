@@ -25,6 +25,7 @@ CONFIG_PATH = Path(os.environ.get("LILY_CONFIG", ROOT / "lily.toml"))
 
 _DEFAULTS: dict = {
     "model": "qwen3:8b",
+    "embed_model": "nomic-embed-text",
     "ollama_host": "http://localhost:11434",
     "context_window": 20,
     "log_level": "INFO",
@@ -72,6 +73,7 @@ def _get(key: str, cast=str):
 
 
 MODEL = _get("model")
+EMBED_MODEL = _get("embed_model")
 OLLAMA_HOST = _get("ollama_host")
 CONTEXT_WINDOW = _get("context_window", int)
 LOG_LEVEL = _get("log_level")
