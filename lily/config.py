@@ -47,6 +47,7 @@ _DEFAULTS: dict = {
     "interrupt_drop_below": "NORMAL",
     "calendar_ics_path": "",
     "calendar_prep_minutes": 15,
+    "rss_feeds": [],
 }
 
 
@@ -66,6 +67,13 @@ def _to_bool(value) -> bool:
     if isinstance(value, bool):
         return value
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _to_list(value) -> list[str]:
+    """A list of strings: pass lists through; split strings on comma/newline."""
+    if isinstance(value, (list, tuple)):
+        return [str(v).strip() for v in value if str(v).strip()]
+    return [part.strip() for part in str(value).replace("\n", ",").split(",") if part.strip()]
 
 
 def _get(key: str, cast=str):
@@ -101,3 +109,4 @@ INTERRUPT_ACTIVE_THRESHOLD = _get("interrupt_active_threshold")
 INTERRUPT_DROP_BELOW = _get("interrupt_drop_below")
 CALENDAR_ICS_PATH = _get("calendar_ics_path")
 CALENDAR_PREP_MINUTES = _get("calendar_prep_minutes", int)
+RSS_FEEDS = _get("rss_feeds", _to_list)

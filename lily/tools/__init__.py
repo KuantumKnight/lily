@@ -79,6 +79,7 @@ def load_builtins() -> None:
         mode,
         notes,
         notifications,
+        opportunities,
         projects,
         recall,
         resources,
