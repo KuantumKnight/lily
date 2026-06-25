@@ -71,6 +71,10 @@ Lily transcribes, replies, and speaks back. She keeps the conversation going
 without re-waking until you fall silent (back to sleep) or say "bye"/"exit".
 Tune `mic_silence_threshold` if she cuts you off or never stops listening.
 
+While she's speaking, press any key to **barge in** — she stops mid-sentence so
+you can talk over her. Set `push_to_talk = true` to gate each turn behind a
+keypress instead of voice-activated recording.
+
 ## Configuration
 
 Environment variables (all optional):
@@ -86,6 +90,8 @@ Environment variables (all optional):
 | `LILY_TTS_AUTOSPEAK` | `false` | speak Lily's replies aloud by default |
 | `LILY_WAKE_MODEL` | `hey_jarvis` | openWakeWord model name or `.onnx`/`.tflite` path |
 | `LILY_WAKE_THRESHOLD` | `0.5` | wake-word detection confidence (0–1) |
+| `LILY_BARGE_IN` | `true` | let a keypress interrupt Lily mid-sentence |
+| `LILY_PUSH_TO_TALK` | `false` | gate each voice turn behind a keypress |
 
 ## Philosophy
 

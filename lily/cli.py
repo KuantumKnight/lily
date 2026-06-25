@@ -6,8 +6,23 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from . import brain, brief, engine, first_run, memory, mic, scheduler, stt, tools, tts, wake
-from .config import CONTEXT_WINDOW, MODEL, TTS_AUTOSPEAK
+import time
+
+from . import (
+    brain,
+    brief,
+    engine,
+    first_run,
+    interrupt,
+    memory,
+    mic,
+    scheduler,
+    stt,
+    tools,
+    tts,
+    wake,
+)
+from .config import BARGE_IN, CONTEXT_WINDOW, MODEL, PUSH_TO_TALK, TTS_AUTOSPEAK
 from .log import get_logger
 from .persona import PERSONA
 
@@ -105,8 +120,35 @@ def _listen_command(user_input: str) -> bool:
     return True
 
 
+def _speak_interruptible(text: str) -> bool:
+    """Speak ``text`` aloud but let the user barge in with a keypress.
+
+    Returns True if interrupted. Falls back to blocking speech if barge-in is off.
+    """
+    if not BARGE_IN:
+        _speak(text)
+        return False
+    try:
+        duration = tts.speak_async(text)
+    except tts.TTSUnavailable as exc:
+        console.print(f"[yellow]voice ›[/] {exc}")
+        return False
+    if duration <= 0:
+        return False
+
+    interrupt.drain()
+    deadline = time.monotonic() + duration + 0.2
+    while time.monotonic() < deadline:
+        if interrupt.key_pressed():
+            tts.stop()
+            console.print("[dim](interrupted — go ahead)[/]")
+            return True
+        time.sleep(0.05)
+    return False
+
+
 def _voice_reply(text: str) -> None:
-    """One spoken turn: build context, think, print, and speak the reply."""
+    """One spoken turn: build context, think, print, and speak the reply (interruptible)."""
     messages = _build_context(text)
     try:
         with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
@@ -116,14 +158,19 @@ def _voice_reply(text: str) -> None:
         return
     _print_reply(reply)
     memory.remember("assistant", reply)
-    _speak(reply)
+    _speak_interruptible(reply)
 
 
 def _active_conversation() -> bool:
     """Tier-2 mode: converse without re-waking. Return True to leave voice chat entirely."""
     console.print("[bold magenta]Lily ›[/] I'm listening.")
-    _speak("I'm listening.")
+    if BARGE_IN:
+        console.print("[dim](press any key while she's talking to interrupt)[/]")
+    _speak_interruptible("I'm listening.")
     while True:
+        if PUSH_TO_TALK:
+            console.print("[dim](push-to-talk) press any key to speak…[/]")
+            interrupt.wait_key()
         with console.status("[magenta]listening…[/]", spinner="dots"):
             samples = mic.record_until_silence()
         text = stt.transcribe_array(samples).strip()

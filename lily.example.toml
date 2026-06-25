@@ -32,3 +32,8 @@ wake_threshold = 0.5
 mic_silence_threshold = 500
 mic_silence_seconds = 1.0
 mic_max_seconds = 15.0
+
+# Interrupts: barge_in lets a keypress cut off her speech; push_to_talk gates
+# each turn behind a keypress instead of voice-activated recording.
+barge_in = true
+push_to_talk = false

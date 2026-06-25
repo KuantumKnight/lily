@@ -9,6 +9,7 @@ from .log import get_logger
 
 log = get_logger("tts")
 _VOICE = None
+_ASYNC_TMP = None  # path of the temp WAV currently playing via speak_async
 
 
 class TTSUnavailable(Exception):
@@ -69,3 +70,46 @@ def speak(text: str) -> None:
             Path(tmp_path).unlink()
         except OSError:
             pass
+
+
+def _wav_seconds(path: str) -> float:
+    with wave.open(path, "rb") as wav_file:
+        rate = wav_file.getframerate() or 1
+        return wav_file.getnframes() / float(rate)
+
+
+def speak_async(text: str) -> float:
+    """Start playing ``text`` without blocking. Returns the clip length in seconds.
+
+    Pair with :func:`stop` for barge-in — call ``stop()`` to cut playback short.
+    """
+    import winsound
+
+    clean = text.strip()
+    if not clean:
+        return 0.0
+    stop()  # cancel anything already playing and drop its temp file
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+        tmp_path = tmp.name
+    synthesize_to_file(clean, tmp_path)
+    winsound.PlaySound(tmp_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
+    global _ASYNC_TMP
+    _ASYNC_TMP = tmp_path
+    return _wav_seconds(tmp_path)
+
+
+def stop() -> None:
+    """Stop any in-progress async playback and clean up its temp file."""
+    global _ASYNC_TMP
+    try:
+        import winsound
+
+        winsound.PlaySound(None, winsound.SND_PURGE)
+    except Exception:  # no audio device / not Windows — nothing to stop
+        pass
+    if _ASYNC_TMP:
+        try:
+            Path(_ASYNC_TMP).unlink()
+        except OSError:
+            pass
+        _ASYNC_TMP = None

@@ -43,7 +43,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] E1  TTS — Piper (Lily's spoken voice)
 - [x] E2  Wake word — openWakeWord ("Lily")
 - [x] E3  Tier-2 conversation mode (no wake word mid-session)
-- [ ] E4  Push-to-talk + barge-in (interrupt her mid-sentence)
+- [x] E4  Push-to-talk + barge-in (interrupt her mid-sentence)
 
 ### Architecture
 - [ ] E5  Orchestrator agent (routes intent → agents)

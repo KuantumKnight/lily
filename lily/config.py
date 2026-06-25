@@ -38,6 +38,8 @@ _DEFAULTS: dict = {
     "mic_silence_threshold": 500,
     "mic_silence_seconds": 1.0,
     "mic_max_seconds": 15.0,
+    "barge_in": True,
+    "push_to_talk": False,
 }
 
 
@@ -83,3 +85,5 @@ WAKE_THRESHOLD = _get("wake_threshold", float)
 MIC_SILENCE_THRESHOLD = _get("mic_silence_threshold", float)
 MIC_SILENCE_SECONDS = _get("mic_silence_seconds", float)
 MIC_MAX_SECONDS = _get("mic_max_seconds", float)
+BARGE_IN = _get("barge_in", _to_bool)
+PUSH_TO_TALK = _get("push_to_talk", _to_bool)
