@@ -52,4 +52,4 @@ def all_agents() -> list["Agent"]:
 
 def load_builtins() -> None:
     """Import the modules that register Lily's built-in agents."""
-    from . import conversation, dev, planner  # noqa: F401
+    from . import conversation, dev, git, planner  # noqa: F401
