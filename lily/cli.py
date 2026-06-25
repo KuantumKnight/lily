@@ -6,8 +6,8 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from . import brain, brief, engine, first_run, memory, scheduler, stt, tools
-from .config import CONTEXT_WINDOW, MODEL
+from . import brain, brief, engine, first_run, memory, scheduler, stt, tools, tts
+from .config import CONTEXT_WINDOW, MODEL, TTS_AUTOSPEAK
 from .log import get_logger
 from .persona import PERSONA
 
@@ -17,6 +17,17 @@ log = get_logger("cli")
 EXIT_WORDS = {"exit", "quit", "bye", "sleep"}
 BRIEF_WORDS = {"brief", "daily brief", "what's up today", "whats up today"}
 TRANSCRIBE_PREFIX = "transcribe "
+SAY_PREFIX = "say "
+
+_autospeak = TTS_AUTOSPEAK
+
+
+def _speak(text: str) -> None:
+    """Voice ``text`` aloud, surfacing setup problems without crashing the REPL."""
+    try:
+        tts.speak(text)
+    except tts.TTSUnavailable as exc:
+        console.print(f"[yellow]voice ›[/] {exc}")
 
 
 def _build_context(user_input: str) -> list[dict]:
@@ -64,6 +75,30 @@ def _transcribe_command(user_input: str) -> bool:
     return True
 
 
+def _say_command(user_input: str) -> bool:
+    if not user_input.lower().startswith(SAY_PREFIX):
+        return False
+    text = user_input[len(SAY_PREFIX):].strip()
+    if text:
+        with console.status("[magenta]Lily is speaking…[/]", spinner="dots"):
+            _speak(text)
+    return True
+
+
+def _voice_command(user_input: str) -> bool:
+    global _autospeak
+    if user_input.lower() not in {"voice", "voice on", "voice off"}:
+        return False
+    if user_input.lower() == "voice on":
+        _autospeak = True
+    elif user_input.lower() == "voice off":
+        _autospeak = False
+    else:
+        _autospeak = not _autospeak
+    console.print(f"[dim]voice › auto-speak {'on' if _autospeak else 'off'}[/]")
+    return True
+
+
 def main() -> None:
     tools.load_builtins()
     setup_warnings = first_run.check_runtime()
@@ -72,7 +107,7 @@ def main() -> None:
     console.print(Panel.fit("[bold magenta]Lily[/] is awake", border_style="magenta"))
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
-        "type 'exit' to sleep | type 'brief' for today | transcribe <audio>[/]\n"
+        "type 'exit' to sleep | brief | transcribe <audio> | say <text> | voice[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -94,6 +129,10 @@ def main() -> None:
                 continue
             if _transcribe_command(user_input):
                 continue
+            if _say_command(user_input):
+                continue
+            if _voice_command(user_input):
+                continue
 
             messages = _build_context(user_input)
 
@@ -106,6 +145,8 @@ def main() -> None:
 
             _print_reply(reply)
             memory.remember("assistant", reply)
+            if _autospeak and reply:
+                _speak(reply)
     finally:
         if reminder_scheduler is not None:
             reminder_scheduler.shutdown(wait=False)

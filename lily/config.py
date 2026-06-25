@@ -31,6 +31,8 @@ _DEFAULTS: dict = {
     "stt_model": "base",
     "stt_device": "cpu",
     "stt_compute_type": "int8",
+    "tts_voice": "",
+    "tts_autospeak": False,
 }
 
 
@@ -44,6 +46,12 @@ def _load_file() -> dict:
 
 
 _FILE = _load_file()
+
+
+def _to_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _get(key: str, cast=str):
@@ -63,3 +71,5 @@ LOG_LEVEL = _get("log_level")
 STT_MODEL = _get("stt_model")
 STT_DEVICE = _get("stt_device")
 STT_COMPUTE_TYPE = _get("stt_compute_type")
+TTS_VOICE = _get("tts_voice")
+TTS_AUTOSPEAK = _get("tts_autospeak", _to_bool)

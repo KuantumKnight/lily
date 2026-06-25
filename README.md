@@ -52,6 +52,15 @@ transcribe path/to/audio.wav
 
 The first transcription loads the configured faster-whisper model locally.
 
+For Lily's spoken voice, download a Piper voice (`.onnx` + `.onnx.json`) from
+[rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices), point `tts_voice`
+at the `.onnx` file, then use:
+
+```text
+say hello, I'm Lily
+voice on       # auto-speak Lily's replies; 'voice off' to stop
+```
+
 ## Configuration
 
 Environment variables (all optional):
@@ -63,6 +72,8 @@ Environment variables (all optional):
 | `LILY_STT_MODEL` | `base` | faster-whisper model for speech-to-text |
 | `LILY_STT_DEVICE` | `cpu` | faster-whisper device, usually `cpu` or `cuda` |
 | `LILY_STT_COMPUTE_TYPE` | `int8` | faster-whisper compute type |
+| `LILY_TTS_VOICE` | _(unset)_ | path to a Piper `.onnx` voice model |
+| `LILY_TTS_AUTOSPEAK` | `false` | speak Lily's replies aloud by default |
 
 ## Philosophy
 
