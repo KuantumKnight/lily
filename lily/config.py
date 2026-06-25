@@ -45,6 +45,8 @@ _DEFAULTS: dict = {
     "resource_autoload": True,
     "interrupt_active_threshold": "NORMAL",
     "interrupt_drop_below": "NORMAL",
+    "calendar_ics_path": "",
+    "calendar_prep_minutes": 15,
 }
 
 
@@ -97,3 +99,5 @@ MODE_DEFAULT = _get("mode")
 RESOURCE_AUTOLOAD = _get("resource_autoload", _to_bool)
 INTERRUPT_ACTIVE_THRESHOLD = _get("interrupt_active_threshold")
 INTERRUPT_DROP_BELOW = _get("interrupt_drop_below")
+CALENDAR_ICS_PATH = _get("calendar_ics_path")
+CALENDAR_PREP_MINUTES = _get("calendar_prep_minutes", int)
