@@ -48,6 +48,9 @@ _DEFAULTS: dict = {
     "calendar_ics_path": "",
     "calendar_prep_minutes": 15,
     "rss_feeds": [],
+    "dashboard_host": "127.0.0.1",
+    "dashboard_port": 8000,
+    "dashboard_enable": False,
 }
 
 
@@ -110,3 +113,6 @@ INTERRUPT_DROP_BELOW = _get("interrupt_drop_below")
 CALENDAR_ICS_PATH = _get("calendar_ics_path")
 CALENDAR_PREP_MINUTES = _get("calendar_prep_minutes", int)
 RSS_FEEDS = _get("rss_feeds", _to_list)
+DASHBOARD_HOST = _get("dashboard_host")
+DASHBOARD_PORT = _get("dashboard_port", int)
+DASHBOARD_ENABLE = _get("dashboard_enable", _to_bool)

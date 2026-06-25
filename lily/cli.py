@@ -27,7 +27,7 @@ from . import (
     tts,
     wake,
 )
-from .config import BARGE_IN, CONTEXT_WINDOW, MODEL, PUSH_TO_TALK, TTS_AUTOSPEAK
+from .config import BARGE_IN, CONTEXT_WINDOW, DASHBOARD_ENABLE, MODEL, PUSH_TO_TALK, TTS_AUTOSPEAK
 from .log import get_logger
 from .persona import PERSONA
 
@@ -280,6 +280,28 @@ def _notifications_command(user_input: str) -> bool:
     return True
 
 
+_dashboard_thread = None
+
+
+def _dashboard_command(user_input: str) -> bool:
+    global _dashboard_thread
+    if user_input.lower().strip() != "dashboard":
+        return False
+    from . import dashboard
+    from .config import DASHBOARD_HOST, DASHBOARD_PORT
+
+    if _dashboard_thread is not None and _dashboard_thread.is_alive():
+        console.print(f"[dim]dashboard › already running at http://{DASHBOARD_HOST}:{DASHBOARD_PORT}[/]")
+        return True
+    try:
+        _dashboard_thread = dashboard.start_in_thread()
+    except dashboard.DashboardUnavailable as exc:
+        console.print(f"[bold red]dashboard ›[/] {exc}")
+        return True
+    console.print(f"[dim]dashboard › serving at http://{DASHBOARD_HOST}:{DASHBOARD_PORT}[/]")
+    return True
+
+
 def _agents_command(user_input: str) -> bool:
     if user_input.lower() != "agents":
         return False
@@ -298,6 +320,8 @@ def main() -> None:
     resource_manager.init()
     notifications.init()
     bus.subscribe("notification.surfaced", _print_surfaced)
+    if DASHBOARD_ENABLE:
+        _dashboard_command("dashboard")
     setup_warnings = first_run.check_runtime()
     reminder_scheduler = scheduler.start_reminder_scheduler(_print_reminder)
     log.info("Lily session started (model=%s)", MODEL)
@@ -305,7 +329,7 @@ def main() -> None:
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
         f"agents: {len(agents.all_agents())} | mode: {mode_module.current()} | "
-        "exit | brief | listen | chat | voice | mode | notifications | agents[/]\n"
+        "exit | brief | listen | chat | voice | mode | notifications | dashboard | agents[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -338,6 +362,8 @@ def main() -> None:
             if _mode_command(user_input):
                 continue
             if _notifications_command(user_input):
+                continue
+            if _dashboard_command(user_input):
                 continue
             if _agents_command(user_input):
                 continue
