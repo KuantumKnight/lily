@@ -18,6 +18,7 @@ from . import (
     memory,
     mic,
     mode as mode_module,
+    notifications,
     orchestrator,
     resource_manager,
     scheduler,
@@ -250,6 +251,35 @@ def _mode_command(user_input: str) -> bool:
     return True
 
 
+def _print_surfaced(topic: str, payload: object) -> None:
+    """Render a flushed/urgent notification batch arriving on the bus."""
+    if not isinstance(payload, dict):
+        return
+    for note in payload.get("notifications", []):
+        src = f" [dim]({note['source']})[/]" if note.get("source") else ""
+        console.print(f"\n[bold yellow]notify ›[/] [{note['priority']}] {note['content']}{src}")
+
+
+def _notifications_command(user_input: str) -> bool:
+    lowered = user_input.lower().strip()
+    if lowered not in {"notifications", "pending", "notifications flush"}:
+        return False
+    if lowered == "notifications flush":
+        if not notifications.flush(reason="cli"):
+            console.print("[dim]notify › nothing to flush[/]")
+        return True
+    items = notifications.pending()
+    if not items:
+        console.print("[dim]notify › no pending notifications[/]")
+        return True
+    lines = [
+        f"[{n.priority}] {n.content}" + (f" [dim]({n.source})[/]" if n.source else "")
+        for n in items
+    ]
+    console.print(Panel("\n".join(lines), title="pending notifications", border_style="yellow"))
+    return True
+
+
 def _agents_command(user_input: str) -> bool:
     if user_input.lower() != "agents":
         return False
@@ -266,6 +296,8 @@ def main() -> None:
     tools.load_builtins()
     agents.load_builtins()
     resource_manager.init()
+    notifications.init()
+    bus.subscribe("notification.surfaced", _print_surfaced)
     setup_warnings = first_run.check_runtime()
     reminder_scheduler = scheduler.start_reminder_scheduler(_print_reminder)
     log.info("Lily session started (model=%s)", MODEL)
@@ -273,7 +305,7 @@ def main() -> None:
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
         f"agents: {len(agents.all_agents())} | mode: {mode_module.current()} | "
-        "exit | brief | listen | chat | voice | mode | agents[/]\n"
+        "exit | brief | listen | chat | voice | mode | notifications | agents[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -304,6 +336,8 @@ def main() -> None:
             if _voice_command(user_input):
                 continue
             if _mode_command(user_input):
+                continue
+            if _notifications_command(user_input):
                 continue
             if _agents_command(user_input):
                 continue

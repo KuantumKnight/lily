@@ -75,6 +75,7 @@ def load_builtins() -> None:
         habits,
         mode,
         notes,
+        notifications,
         projects,
         recall,
         resources,
