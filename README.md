@@ -82,6 +82,11 @@ until you add more. Agents communicate over an in-process **event bus**
 (`user.message`, `lily.reply`, `reminder.fired`, …). Build your own agent with
 the `lily.sdk` SDK — `register` a handler and `subscribe` to bus topics.
 
+Lily keeps **project memory**: set an active project and she scopes notes to it
+and folds them into her context. Just ask her ("we're working on the taxes
+project", "note that the receipts are in Drive", "what do you have on this
+project?") and she'll use the project tools.
+
 ## Configuration
 
 Environment variables (all optional):

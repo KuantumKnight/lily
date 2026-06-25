@@ -53,6 +53,9 @@ def _build_context(user_input: str) -> list[dict]:
     facts = memory.long_term_context()
     if facts:
         system_prompt = f"{system_prompt}\n\n{facts}"
+    project = memory.project_context()
+    if project:
+        system_prompt = f"{system_prompt}\n\n{project}"
     return [{"role": "system", "content": system_prompt}, *memory.recent(CONTEXT_WINDOW)]
 
 
