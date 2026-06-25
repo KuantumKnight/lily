@@ -1,10 +1,12 @@
 """The terminal REPL — talk to Lily. This is where she comes alive."""
 
+import shlex
+
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from . import brain, brief, engine, first_run, memory, scheduler, tools
+from . import brain, brief, engine, first_run, memory, scheduler, stt, tools
 from .config import CONTEXT_WINDOW, MODEL
 from .log import get_logger
 from .persona import PERSONA
@@ -14,6 +16,7 @@ log = get_logger("cli")
 
 EXIT_WORDS = {"exit", "quit", "bye", "sleep"}
 BRIEF_WORDS = {"brief", "daily brief", "what's up today", "whats up today"}
+TRANSCRIBE_PREFIX = "transcribe "
 
 
 def _build_context(user_input: str) -> list[dict]:
@@ -34,6 +37,33 @@ def _print_reply(reply: str) -> None:
     console.print(Panel(Markdown(reply or "..."), title="Lily", border_style="magenta"))
 
 
+def _transcribe_command(user_input: str) -> bool:
+    if not user_input.lower().startswith(TRANSCRIBE_PREFIX):
+        return False
+
+    try:
+        parts = shlex.split(user_input, posix=False)
+    except ValueError as exc:
+        console.print(f"[bold red]transcribe ›[/] {exc}")
+        return True
+
+    if len(parts) < 2:
+        console.print("[bold red]transcribe ›[/] usage: transcribe path\\to\\audio.wav")
+        return True
+
+    audio_path = " ".join(parts[1:]).strip('"')
+    with console.status("[magenta]Lily is listening…[/]", spinner="dots"):
+        try:
+            transcript = stt.transcribe_file(audio_path)
+        except stt.STTUnavailable as exc:
+            console.print(f"[bold red]transcribe ›[/] {exc}")
+            return True
+
+    _print_reply(transcript)
+    memory.remember("user", f"[transcribed audio] {transcript}")
+    return True
+
+
 def main() -> None:
     tools.load_builtins()
     setup_warnings = first_run.check_runtime()
@@ -42,7 +72,7 @@ def main() -> None:
     console.print(Panel.fit("[bold magenta]Lily[/] is awake", border_style="magenta"))
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
-        "type 'exit' to sleep | type 'brief' for today[/]\n"
+        "type 'exit' to sleep | type 'brief' for today | transcribe <audio>[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -61,6 +91,8 @@ def main() -> None:
                 break
             if user_input.lower() in BRIEF_WORDS:
                 _print_reply(brief.daily_brief())
+                continue
+            if _transcribe_command(user_input):
                 continue
 
             messages = _build_context(user_input)

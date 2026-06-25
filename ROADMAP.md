@@ -39,7 +39,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 ## v2 — Lily Voice (Effort)
 
 ### She speaks & listens
-- [ ] E0  STT — faster-whisper (speech → text)
+- [x] E0  STT — faster-whisper (speech → text)
 - [ ] E1  TTS — Piper (Lily's spoken voice)
 - [ ] E2  Wake word — openWakeWord ("Lily")
 - [ ] E3  Tier-2 conversation mode (no wake word mid-session)

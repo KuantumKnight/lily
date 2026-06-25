@@ -9,7 +9,7 @@ from .log import get_logger
 
 log = get_logger("first_run")
 
-REQUIRED_PACKAGES = ("ollama", "rich", "psutil", "apscheduler")
+REQUIRED_PACKAGES = ("ollama", "rich", "psutil", "apscheduler", "faster-whisper")
 
 
 def check_runtime() -> list[str]:

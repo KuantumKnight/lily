@@ -44,6 +44,14 @@ Lily runs first-start checks for installed Python packages, Ollama reachability,
 whether the configured model is pulled. Inside the REPL, type `brief` for a local daily
 brief with system status, reminders, notes, and remembered facts.
 
+For local speech-to-text, install the requirements and run:
+
+```bash
+transcribe path/to/audio.wav
+```
+
+The first transcription loads the configured faster-whisper model locally.
+
 ## Configuration
 
 Environment variables (all optional):
@@ -52,6 +60,9 @@ Environment variables (all optional):
 |---|---|---|
 | `LILY_MODEL` | `qwen3:8b` | Ollama model used as Lily's brain |
 | `LILY_OLLAMA_HOST` | `http://localhost:11434` | Ollama server URL |
+| `LILY_STT_MODEL` | `base` | faster-whisper model for speech-to-text |
+| `LILY_STT_DEVICE` | `cpu` | faster-whisper device, usually `cpu` or `cuda` |
+| `LILY_STT_COMPUTE_TYPE` | `int8` | faster-whisper compute type |
 
 ## Philosophy
 

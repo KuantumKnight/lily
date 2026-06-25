@@ -28,6 +28,9 @@ _DEFAULTS: dict = {
     "ollama_host": "http://localhost:11434",
     "context_window": 20,
     "log_level": "INFO",
+    "stt_model": "base",
+    "stt_device": "cpu",
+    "stt_compute_type": "int8",
 }
 
 
@@ -57,3 +60,6 @@ MODEL = _get("model")
 OLLAMA_HOST = _get("ollama_host")
 CONTEXT_WINDOW = _get("context_window", int)
 LOG_LEVEL = _get("log_level")
+STT_MODEL = _get("stt_model")
+STT_DEVICE = _get("stt_device")
+STT_COMPUTE_TYPE = _get("stt_compute_type")
