@@ -12,6 +12,7 @@ from . import (
     agents,
     brain,
     brief,
+    bus,
     first_run,
     interrupt,
     memory,
@@ -58,6 +59,7 @@ def _build_context(user_input: str) -> list[dict]:
 def _print_reminder(row) -> None:
     due = f" [dim]({row['due_at']})[/]" if row["due_at"] else ""
     console.print(f"\n[bold yellow]reminder ›[/] {row['content']}{due}")
+    bus.publish("reminder.fired", {"content": row["content"], "due_at": row["due_at"]})
 
 
 def _print_reply(reply: str) -> None:

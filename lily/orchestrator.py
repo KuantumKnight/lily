@@ -5,7 +5,7 @@ about. :func:`route` is the single seam where smarter (LLM-based) intent
 classification can be dropped in without touching callers.
 """
 
-from . import agents
+from . import agents, bus
 from .log import get_logger
 
 log = get_logger("orchestrator")
@@ -25,11 +25,16 @@ def route(query: str) -> "agents.Agent | None":
 
 
 def handle(query: str, messages: list) -> str:
-    """Route ``query`` to an agent and return its reply."""
+    """Route ``query`` to an agent and return its reply, announcing both on the bus."""
+    bus.publish("user.message", {"query": query})
     agent = route(query)
     if agent is None:  # roster empty — fall back to the raw engine
         from . import engine
 
-        return engine.converse(messages)
+        reply = engine.converse(messages)
+        bus.publish("lily.reply", {"query": query, "agent": None, "reply": reply})
+        return reply
     log.info("routing to agent: %s", agent.name)
-    return agent.handler(query, messages)
+    reply = agent.handler(query, messages)
+    bus.publish("lily.reply", {"query": query, "agent": agent.name, "reply": reply})
+    return reply

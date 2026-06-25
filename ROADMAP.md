@@ -47,7 +47,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 
 ### Architecture
 - [x] E5  Orchestrator agent (routes intent → agents)
-- [ ] E6  Agent bus (pub/sub, agent registration SDK)
+- [x] E6  Agent bus (pub/sub, agent registration SDK)
 - [ ] E7  Planner agent (multi-step task decomposition)
 - [ ] E8  Memory layers: project memory
 - [ ] E9  Memory layers: behavior memory (habits, work hours)

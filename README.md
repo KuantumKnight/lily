@@ -78,7 +78,9 @@ keypress instead of voice-activated recording.
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
-until you add more. Register your own with the `lily.agents` SDK.
+until you add more. Agents communicate over an in-process **event bus**
+(`user.message`, `lily.reply`, `reminder.fired`, …). Build your own agent with
+the `lily.sdk` SDK — `register` a handler and `subscribe` to bus topics.
 
 ## Configuration
 
