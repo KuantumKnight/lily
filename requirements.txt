@@ -4,3 +4,5 @@ psutil>=5.9.0
 APScheduler>=3.10.0
 faster-whisper>=1.0.0
 piper-tts>=1.4.0
+openwakeword>=0.6.0
+sounddevice>=0.4.6

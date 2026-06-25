@@ -33,6 +33,8 @@ _DEFAULTS: dict = {
     "stt_compute_type": "int8",
     "tts_voice": "",
     "tts_autospeak": False,
+    "wake_model": "hey_jarvis",
+    "wake_threshold": 0.5,
 }
 
 
@@ -73,3 +75,5 @@ STT_DEVICE = _get("stt_device")
 STT_COMPUTE_TYPE = _get("stt_compute_type")
 TTS_VOICE = _get("tts_voice")
 TTS_AUTOSPEAK = _get("tts_autospeak", _to_bool)
+WAKE_MODEL = _get("wake_model")
+WAKE_THRESHOLD = _get("wake_threshold", float)

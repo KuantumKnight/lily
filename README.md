@@ -61,6 +61,11 @@ say hello, I'm Lily
 voice on       # auto-speak Lily's replies; 'voice off' to stop
 ```
 
+To have Lily listen for her wake word, type `listen` in the REPL (Ctrl+C to stop).
+openWakeWord ships no "Lily" model yet, so `wake_model` defaults to the bundled
+`hey_jarvis`; train a custom model and point `wake_model` at its `.onnx`/`.tflite`
+to wake her by name.
+
 ## Configuration
 
 Environment variables (all optional):
@@ -74,6 +79,8 @@ Environment variables (all optional):
 | `LILY_STT_COMPUTE_TYPE` | `int8` | faster-whisper compute type |
 | `LILY_TTS_VOICE` | _(unset)_ | path to a Piper `.onnx` voice model |
 | `LILY_TTS_AUTOSPEAK` | `false` | speak Lily's replies aloud by default |
+| `LILY_WAKE_MODEL` | `hey_jarvis` | openWakeWord model name or `.onnx`/`.tflite` path |
+| `LILY_WAKE_THRESHOLD` | `0.5` | wake-word detection confidence (0–1) |
 
 ## Philosophy
 

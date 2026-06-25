@@ -22,3 +22,7 @@ stt_compute_type = "int8"
 # Text-to-speech (Piper). Point tts_voice at a downloaded .onnx voice model.
 tts_voice = ""
 tts_autospeak = false
+
+# Wake word (openWakeWord). Bundled name or a path to a custom .onnx/.tflite model.
+wake_model = "hey_jarvis"
+wake_threshold = 0.5

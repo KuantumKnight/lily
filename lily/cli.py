@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from . import brain, brief, engine, first_run, memory, scheduler, stt, tools, tts
+from . import brain, brief, engine, first_run, memory, scheduler, stt, tools, tts, wake
 from .config import CONTEXT_WINDOW, MODEL, TTS_AUTOSPEAK
 from .log import get_logger
 from .persona import PERSONA
@@ -85,6 +85,26 @@ def _say_command(user_input: str) -> bool:
     return True
 
 
+def _listen_command(user_input: str) -> bool:
+    if user_input.lower() != "listen":
+        return False
+
+    def _on_wake(name: str, score: float) -> bool:
+        console.print(f"\n[bold magenta]Lily ›[/] heard her wake word [dim]({name} {score:.2f})[/]")
+        if _autospeak:
+            _speak("Yes?")
+        return False  # keep listening
+
+    console.print("[dim]listening for wake word… press Ctrl+C to stop[/]")
+    try:
+        wake.listen_for_wake(_on_wake)
+    except wake.WakeUnavailable as exc:
+        console.print(f"[bold red]listen ›[/] {exc}")
+    except KeyboardInterrupt:
+        console.print("[dim]stopped listening[/]")
+    return True
+
+
 def _voice_command(user_input: str) -> bool:
     global _autospeak
     if user_input.lower() not in {"voice", "voice on", "voice off"}:
@@ -107,7 +127,7 @@ def main() -> None:
     console.print(Panel.fit("[bold magenta]Lily[/] is awake", border_style="magenta"))
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
-        "type 'exit' to sleep | brief | transcribe <audio> | say <text> | voice[/]\n"
+        "type 'exit' to sleep | brief | transcribe <audio> | say <text> | listen | voice[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -130,6 +150,8 @@ def main() -> None:
             if _transcribe_command(user_input):
                 continue
             if _say_command(user_input):
+                continue
+            if _listen_command(user_input):
                 continue
             if _voice_command(user_input):
                 continue
