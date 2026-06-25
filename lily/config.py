@@ -43,6 +43,8 @@ _DEFAULTS: dict = {
     "push_to_talk": False,
     "mode": "passive",
     "resource_autoload": True,
+    "interrupt_active_threshold": "NORMAL",
+    "interrupt_drop_below": "NORMAL",
 }
 
 
@@ -93,3 +95,5 @@ BARGE_IN = _get("barge_in", _to_bool)
 PUSH_TO_TALK = _get("push_to_talk", _to_bool)
 MODE_DEFAULT = _get("mode")
 RESOURCE_AUTOLOAD = _get("resource_autoload", _to_bool)
+INTERRUPT_ACTIVE_THRESHOLD = _get("interrupt_active_threshold")
+INTERRUPT_DROP_BELOW = _get("interrupt_drop_below")
