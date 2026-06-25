@@ -49,6 +49,18 @@ def _load_model():
     return _MODEL
 
 
+def is_loaded() -> bool:
+    return _MODEL is not None
+
+
+def unload() -> None:
+    """Release the wake model so its RAM can be reclaimed; reloads lazily on next use."""
+    global _MODEL
+    if _MODEL is not None:
+        _MODEL = None
+        log.info("wake model unloaded")
+
+
 def listen_for_wake(on_wake, stop_event=None) -> None:
     """Stream the microphone and call ``on_wake(name, score)`` when the word fires.
 

@@ -19,6 +19,7 @@ from . import (
     mic,
     mode as mode_module,
     orchestrator,
+    resource_manager,
     scheduler,
     stt,
     tools,
@@ -264,6 +265,7 @@ def _agents_command(user_input: str) -> bool:
 def main() -> None:
     tools.load_builtins()
     agents.load_builtins()
+    resource_manager.init()
     setup_warnings = first_run.check_runtime()
     reminder_scheduler = scheduler.start_reminder_scheduler(_print_reminder)
     log.info("Lily session started (model=%s)", MODEL)

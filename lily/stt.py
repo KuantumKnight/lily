@@ -50,6 +50,18 @@ def _run(audio, language: str):
     return text, info
 
 
+def is_loaded() -> bool:
+    return _MODEL is not None
+
+
+def unload() -> None:
+    """Release the STT model so its RAM can be reclaimed; reloads lazily on next use."""
+    global _MODEL
+    if _MODEL is not None:
+        _MODEL = None
+        log.info("stt model unloaded")
+
+
 def transcribe_file(path: str, language: str = "") -> str:
     """Transcribe one local audio file and return plain text with light metadata."""
     audio_path = Path(path).expanduser()

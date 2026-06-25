@@ -42,6 +42,7 @@ _DEFAULTS: dict = {
     "barge_in": True,
     "push_to_talk": False,
     "mode": "passive",
+    "resource_autoload": True,
 }
 
 
@@ -91,3 +92,4 @@ MIC_MAX_SECONDS = _get("mic_max_seconds", float)
 BARGE_IN = _get("barge_in", _to_bool)
 PUSH_TO_TALK = _get("push_to_talk", _to_bool)
 MODE_DEFAULT = _get("mode")
+RESOURCE_AUTOLOAD = _get("resource_autoload", _to_bool)

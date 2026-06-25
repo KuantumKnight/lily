@@ -55,7 +55,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 
 ### Modes & interrupts
 - [x] E11 Passive / Active mode switching
-- [ ] E12 Resource manager (load/unload models on mode change)
+- [x] E12 Resource manager (load/unload models on mode change)
 - [ ] E13 Interrupt priority engine (low → emergency)
 - [ ] E14 Notification batching (defend focus, no spam)
 

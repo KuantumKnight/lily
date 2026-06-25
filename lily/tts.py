@@ -42,6 +42,19 @@ def _load_voice():
     return _VOICE
 
 
+def is_loaded() -> bool:
+    return _VOICE is not None
+
+
+def unload() -> None:
+    """Stop playback and release the Piper voice; reloads lazily on next use."""
+    global _VOICE
+    stop()
+    if _VOICE is not None:
+        _VOICE = None
+        log.info("tts voice unloaded")
+
+
 def synthesize_to_file(text: str, path: str) -> str:
     """Synthesize ``text`` to a WAV file and return its path."""
     clean = text.strip()
