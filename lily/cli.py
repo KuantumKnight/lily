@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from . import brain, brief, engine, first_run, memory, scheduler, stt, tools, tts, wake
+from . import brain, brief, engine, first_run, memory, mic, scheduler, stt, tools, tts, wake
 from .config import CONTEXT_WINDOW, MODEL, TTS_AUTOSPEAK
 from .log import get_logger
 from .persona import PERSONA
@@ -105,6 +105,64 @@ def _listen_command(user_input: str) -> bool:
     return True
 
 
+def _voice_reply(text: str) -> None:
+    """One spoken turn: build context, think, print, and speak the reply."""
+    messages = _build_context(text)
+    try:
+        with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
+            reply = engine.converse(messages)
+    except brain.BrainOffline as exc:
+        console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
+        return
+    _print_reply(reply)
+    memory.remember("assistant", reply)
+    _speak(reply)
+
+
+def _active_conversation() -> bool:
+    """Tier-2 mode: converse without re-waking. Return True to leave voice chat entirely."""
+    console.print("[bold magenta]Lily ›[/] I'm listening.")
+    _speak("I'm listening.")
+    while True:
+        with console.status("[magenta]listening…[/]", spinner="dots"):
+            samples = mic.record_until_silence()
+        text = stt.transcribe_array(samples).strip()
+        if not text:
+            console.print("[dim]…silence — back to sleep. Say the wake word again.[/]")
+            return False
+        console.print(f"[bold cyan]you (voice) ›[/] {text}")
+        if text.lower().strip(" .,!?") in EXIT_WORDS:
+            return True
+        _voice_reply(text)
+
+
+def _chat_command(user_input: str) -> bool:
+    if user_input.lower() not in {"chat", "converse"}:
+        return False
+
+    woke = {"hit": False}
+
+    def _on_wake(name: str, score: float) -> bool:
+        woke["hit"] = True
+        return True  # stop the wake listener and go active
+
+    try:
+        while True:
+            woke["hit"] = False
+            console.print("[dim]listening for wake word… (Ctrl+C to leave voice chat)[/]")
+            wake.listen_for_wake(_on_wake)
+            if not woke["hit"]:
+                break
+            if _active_conversation():
+                break
+    except (wake.WakeUnavailable, mic.MicUnavailable, stt.STTUnavailable) as exc:
+        console.print(f"[bold red]chat ›[/] {exc}")
+    except KeyboardInterrupt:
+        pass
+    console.print("[dim]left voice chat[/]")
+    return True
+
+
 def _voice_command(user_input: str) -> bool:
     global _autospeak
     if user_input.lower() not in {"voice", "voice on", "voice off"}:
@@ -127,7 +185,7 @@ def main() -> None:
     console.print(Panel.fit("[bold magenta]Lily[/] is awake", border_style="magenta"))
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
-        "type 'exit' to sleep | brief | transcribe <audio> | say <text> | listen | voice[/]\n"
+        "type 'exit' to sleep | brief | transcribe | say <text> | listen | chat | voice[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -152,6 +210,8 @@ def main() -> None:
             if _say_command(user_input):
                 continue
             if _listen_command(user_input):
+                continue
+            if _chat_command(user_input):
                 continue
             if _voice_command(user_input):
                 continue

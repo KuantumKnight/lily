@@ -66,6 +66,11 @@ openWakeWord ships no "Lily" model yet, so `wake_model` defaults to the bundled
 `hey_jarvis`; train a custom model and point `wake_model` at its `.onnx`/`.tflite`
 to wake her by name.
 
+For full hands-free conversation, type `chat`: say your wake word, then talk —
+Lily transcribes, replies, and speaks back. She keeps the conversation going
+without re-waking until you fall silent (back to sleep) or say "bye"/"exit".
+Tune `mic_silence_threshold` if she cuts you off or never stops listening.
+
 ## Configuration
 
 Environment variables (all optional):

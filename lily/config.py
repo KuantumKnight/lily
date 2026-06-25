@@ -35,6 +35,9 @@ _DEFAULTS: dict = {
     "tts_autospeak": False,
     "wake_model": "hey_jarvis",
     "wake_threshold": 0.5,
+    "mic_silence_threshold": 500,
+    "mic_silence_seconds": 1.0,
+    "mic_max_seconds": 15.0,
 }
 
 
@@ -77,3 +80,6 @@ TTS_VOICE = _get("tts_voice")
 TTS_AUTOSPEAK = _get("tts_autospeak", _to_bool)
 WAKE_MODEL = _get("wake_model")
 WAKE_THRESHOLD = _get("wake_threshold", float)
+MIC_SILENCE_THRESHOLD = _get("mic_silence_threshold", float)
+MIC_SILENCE_SECONDS = _get("mic_silence_seconds", float)
+MIC_MAX_SECONDS = _get("mic_max_seconds", float)

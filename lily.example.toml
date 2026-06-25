@@ -26,3 +26,9 @@ tts_autospeak = false
 # Wake word (openWakeWord). Bundled name or a path to a custom .onnx/.tflite model.
 wake_model = "hey_jarvis"
 wake_threshold = 0.5
+
+# Microphone capture for voice conversation (the `chat` command).
+# Raise mic_silence_threshold if she stops too early; lower it if she never stops.
+mic_silence_threshold = 500
+mic_silence_seconds = 1.0
+mic_max_seconds = 15.0

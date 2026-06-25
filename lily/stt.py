@@ -39,6 +39,17 @@ def _load_model():
     return _MODEL
 
 
+def _run(audio, language: str):
+    """Transcribe an audio source (path or float32 array). Returns (text, info)."""
+    model = _load_model()
+    kwargs = {"vad_filter": True}
+    if language.strip():
+        kwargs["language"] = language.strip()
+    segments, info = model.transcribe(audio, **kwargs)
+    text = " ".join(segment.text.strip() for segment in segments if segment.text.strip())
+    return text, info
+
+
 def transcribe_file(path: str, language: str = "") -> str:
     """Transcribe one local audio file and return plain text with light metadata."""
     audio_path = Path(path).expanduser()
@@ -47,16 +58,18 @@ def transcribe_file(path: str, language: str = "") -> str:
     if not audio_path.is_file():
         raise STTUnavailable(f"audio path is not a file: {audio_path}")
 
-    model = _load_model()
-    kwargs = {"vad_filter": True}
-    if language.strip():
-        kwargs["language"] = language.strip()
-
-    segments, info = model.transcribe(str(audio_path), **kwargs)
-    text = " ".join(segment.text.strip() for segment in segments if segment.text.strip())
+    text, info = _run(str(audio_path), language)
     if not text:
         return "[no speech detected]"
 
     detected = getattr(info, "language", "unknown")
     probability = getattr(info, "language_probability", 0.0)
     return f"{text}\n\n[language: {detected}, probability: {probability:.2f}]"
+
+
+def transcribe_array(samples, language: str = "") -> str:
+    """Transcribe float32 mono samples at 16kHz and return plain text (no metadata)."""
+    if samples is None or len(samples) == 0:
+        return ""
+    text, _ = _run(samples, language)
+    return text
