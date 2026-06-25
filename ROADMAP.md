@@ -56,20 +56,20 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 ### Modes & interrupts
 - [x] E11 Passive / Active mode switching
 - [x] E12 Resource manager (load/unload models on mode change)
-- [ ] E13 Interrupt priority engine (low → emergency)
-- [ ] E14 Notification batching (defend focus, no spam)
+- [x] E13 Interrupt priority engine (low → emergency)
+- [x] E14 Notification batching (defend focus, no spam)
 
 ### Real agents (healthy versions)
-- [ ] E15 Dev agent — watch git/terminal, detect build/test failures, suggest fixes
-- [ ] E16 Git agent — weekly "what I actually shipped" digest (NOT vanity streaks)
-- [ ] E17 Calendar agent — local .ics / CalDAV (open source), conflict + prep reminders
-- [ ] E18 Security watchdog — secret-in-clipboard / repo scan (local only)
-- [ ] E19 Opportunity agent — RSS/Atom feeds only (CTFTime, conf CFPs), no scraping
+- [x] E15 Dev agent — watch git/terminal, detect build/test failures, suggest fixes
+- [x] E16 Git agent — weekly "what I actually shipped" digest (NOT vanity streaks)
+- [x] E17 Calendar agent — local .ics / CalDAV (open source), conflict + prep reminders
+- [x] E18 Security watchdog — secret-in-clipboard / repo scan (local only)
+- [x] E19 Opportunity agent — RSS/Atom feeds only (CTFTime, conf CFPs), no scraping
 
 ### Dashboard
-- [ ] E20 Dashboard backend (FastAPI, local-only bind)
-- [ ] E21 Dashboard UI (Svelte) — system / work / calendar / security cards
-- [ ] E22 Live updates (websocket) + card framework
+- [x] E20 Dashboard backend (FastAPI, local-only bind)
+- [x] E21 Dashboard UI (static HTML/CSS/JS, no build) — system / work / calendar / security cards
+- [x] E22 Live updates (websocket) + card framework
 
 ---
 
