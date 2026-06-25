@@ -52,6 +52,17 @@ def _conn() -> sqlite3.Connection:
         )
         """
     )
+    # Layer 3 — behavior memory: a timestamped log of when the user interacts,
+    # from which Lily infers habits (typical active hours, busiest day).
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS activity (
+            id   INTEGER PRIMARY KEY AUTOINCREMENT,
+            ts   REAL NOT NULL,
+            kind TEXT NOT NULL
+        )
+        """
+    )
     return conn
 
 
@@ -226,3 +237,69 @@ def project_context(limit: int = 8) -> str:
     for note in reversed(notes):
         lines.append(f"- {note['content']}")
     return "\n".join(lines)
+
+
+# --- Layer 3: behavior memory ------------------------------------------------
+
+_WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+
+def record_activity(kind: str = "message", ts: float | None = None) -> None:
+    """Log one interaction so Lily can learn the user's rhythms."""
+    conn = _conn()
+    with conn:
+        conn.execute(
+            "INSERT INTO activity (ts, kind) VALUES (?, ?)",
+            (time.time() if ts is None else ts, kind.strip() or "message"),
+        )
+    conn.close()
+
+
+def _activity_timestamps() -> list[float]:
+    conn = _conn()
+    rows = conn.execute("SELECT ts FROM activity").fetchall()
+    conn.close()
+    return [row[0] for row in rows]
+
+
+def work_hours(min_samples: int = 8) -> tuple[int, int] | None:
+    """Infer the user's typical active window as (start_hour, end_hour), 0–23.
+
+    Uses the 10th/90th percentile of activity hours so a couple of odd-hour
+    sessions don't widen the window. Returns None below ``min_samples``.
+    """
+    hours = sorted(time.localtime(ts).tm_hour for ts in _activity_timestamps())
+    if len(hours) < min_samples:
+        return None
+    lo = hours[int(0.1 * len(hours))]
+    hi = hours[min(int(0.9 * len(hours)), len(hours) - 1)]
+    return lo, hi
+
+
+def busiest_weekday(min_samples: int = 8) -> str | None:
+    """The weekday name with the most recorded activity, or None below min_samples."""
+    timestamps = _activity_timestamps()
+    if len(timestamps) < min_samples:
+        return None
+    counts = [0] * 7
+    for ts in timestamps:
+        counts[time.localtime(ts).tm_wday] += 1
+    return _WEEKDAYS[counts.index(max(counts))]
+
+
+def _fmt_hour(hour: int) -> str:
+    suffix = "am" if hour < 12 else "pm"
+    twelve = hour % 12 or 12
+    return f"{twelve}{suffix}"
+
+
+def behavior_summary(min_samples: int = 8) -> str:
+    """One-line habit summary for the system prompt. Empty until enough data."""
+    window = work_hours(min_samples)
+    if window is None:
+        return ""
+    parts = [f"usually active {_fmt_hour(window[0])}–{_fmt_hour(window[1])}"]
+    weekday = busiest_weekday(min_samples)
+    if weekday:
+        parts.append(f"most active on {weekday}s")
+    return "User habits: " + ", ".join(parts) + "."

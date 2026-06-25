@@ -87,6 +87,10 @@ and folds them into her context. Just ask her ("we're working on the taxes
 project", "note that the receipts are in Drive", "what do you have on this
 project?") and she'll use the project tools.
 
+She also builds **behavior memory** from when you interact — over time she learns
+your typical active hours and busiest day ("what are my work hours?"). It stays
+quiet until there's enough data to be more than a guess.
+
 ## Configuration
 
 Environment variables (all optional):

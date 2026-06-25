@@ -49,6 +49,7 @@ def _speak(text: str) -> None:
 
 def _build_context(user_input: str) -> list[dict]:
     memory.remember("user", user_input)
+    memory.record_activity("message")
     system_prompt = PERSONA
     facts = memory.long_term_context()
     if facts:
@@ -56,6 +57,9 @@ def _build_context(user_input: str) -> list[dict]:
     project = memory.project_context()
     if project:
         system_prompt = f"{system_prompt}\n\n{project}"
+    habits = memory.behavior_summary()
+    if habits:
+        system_prompt = f"{system_prompt}\n\n{habits}"
     return [{"role": "system", "content": system_prompt}, *memory.recent(CONTEXT_WINDOW)]
 
 
