@@ -73,6 +73,7 @@ def load_builtins() -> None:
         builtin,
         facts,
         habits,
+        mode,
         notes,
         projects,
         recall,

@@ -54,7 +54,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] E10 Vector recall (sqlite-vec embeddings + semantic search)
 
 ### Modes & interrupts
-- [ ] E11 Passive / Active mode switching
+- [x] E11 Passive / Active mode switching
 - [ ] E12 Resource manager (load/unload models on mode change)
 - [ ] E13 Interrupt priority engine (low → emergency)
 - [ ] E14 Notification batching (defend focus, no spam)

@@ -17,6 +17,7 @@ from . import (
     interrupt,
     memory,
     mic,
+    mode as mode_module,
     orchestrator,
     scheduler,
     stt,
@@ -176,6 +177,7 @@ def _active_conversation() -> bool:
     console.print("[bold magenta]Lily ›[/] I'm listening.")
     if BARGE_IN:
         console.print("[dim](press any key while she's talking to interrupt)[/]")
+    mode_module.set_mode(mode_module.MODE_ACTIVE, reason="wake")
     _speak_interruptible("I'm listening.")
     while True:
         if PUSH_TO_TALK:
@@ -186,9 +188,11 @@ def _active_conversation() -> bool:
         text = stt.transcribe_array(samples).strip()
         if not text:
             console.print("[dim]…silence — back to sleep. Say the wake word again.[/]")
+            mode_module.set_mode(mode_module.MODE_PASSIVE, reason="silence")
             return False
         console.print(f"[bold cyan]you (voice) ›[/] {text}")
         if text.lower().strip(" .,!?") in EXIT_WORDS:
+            mode_module.set_mode(mode_module.MODE_PASSIVE, reason="exit")
             return True
         _voice_reply(text)
 
@@ -234,6 +238,17 @@ def _voice_command(user_input: str) -> bool:
     return True
 
 
+def _mode_command(user_input: str) -> bool:
+    lowered = user_input.lower().strip()
+    if lowered not in {"mode", "mode?", "mode passive", "mode active"}:
+        return False
+    if lowered in {"mode passive", "mode active"}:
+        target = lowered.split()[1]
+        mode_module.set_mode(target, reason="cli")
+    console.print(f"[dim]mode › {mode_module.current()}[/]")
+    return True
+
+
 def _agents_command(user_input: str) -> bool:
     if user_input.lower() != "agents":
         return False
@@ -255,8 +270,8 @@ def main() -> None:
     console.print(Panel.fit("[bold magenta]Lily[/] is awake", border_style="magenta"))
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
-        f"agents: {len(agents.all_agents())} | "
-        "exit | brief | transcribe | say | listen | chat | voice | agents[/]\n"
+        f"agents: {len(agents.all_agents())} | mode: {mode_module.current()} | "
+        "exit | brief | listen | chat | voice | mode | agents[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -285,6 +300,8 @@ def main() -> None:
             if _chat_command(user_input):
                 continue
             if _voice_command(user_input):
+                continue
+            if _mode_command(user_input):
                 continue
             if _agents_command(user_input):
                 continue
