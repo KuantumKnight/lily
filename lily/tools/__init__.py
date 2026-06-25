@@ -71,6 +71,7 @@ def load_builtins() -> None:
     from . import (  # noqa: F401
         brief,
         builtin,
+        dev,
         facts,
         habits,
         mode,
