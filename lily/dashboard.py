@@ -11,6 +11,7 @@ file is the single app extended across all three.
 """
 
 import os
+from pathlib import Path
 
 import psutil
 
@@ -21,6 +22,8 @@ from .config import DASHBOARD_HOST, DASHBOARD_PORT
 from .log import get_logger
 
 log = get_logger("dashboard")
+
+STATIC_DIR = Path(__file__).resolve().parent / "dashboard_static"
 
 
 class DashboardUnavailable(RuntimeError):
@@ -86,6 +89,17 @@ def brief_card() -> dict:
     return {"brief": brief.daily_brief()}
 
 
+def all_cards() -> dict:
+    """Every card the UI renders, in one payload (used by /api/cards and the websocket)."""
+    return {
+        "status": status_card(),
+        "system": system_card(),
+        "habits": habits_card(),
+        "facts": memory_facts_card(10),
+        "projects": memory_projects_card(),
+    }
+
+
 # ---- app ----------------------------------------------------------------------
 
 def create_app():
@@ -122,6 +136,16 @@ def create_app():
     @app.get("/api/brief")
     def _brief():
         return brief_card()
+
+    @app.get("/api/cards")
+    def _cards():
+        return all_cards()
+
+    # Static UI (E21) — served at the root. html=True makes "/" serve index.html.
+    if STATIC_DIR.is_dir():
+        from fastapi.staticfiles import StaticFiles
+
+        app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
 
     return app
 
