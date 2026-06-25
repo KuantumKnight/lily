@@ -10,12 +10,14 @@ E21 adds the static UI + card providers; E22 adds a websocket bridging the bus. 
 file is the single app extended across all three.
 """
 
+import asyncio
+import json
 import os
 from pathlib import Path
 
 import psutil
 
-from . import agents, brief, memory
+from . import agents, brief, bus, memory
 from . import mode as mode_module
 from . import tools
 from .config import DASHBOARD_HOST, DASHBOARD_PORT
@@ -89,6 +91,61 @@ def brief_card() -> dict:
     return {"brief": brief.daily_brief()}
 
 
+# ---- live websocket bridge (E22) ----------------------------------------------
+
+# Bus topics worth pushing to the browser. Each nudges the client to refresh its cards.
+_LIVE_TOPICS = {
+    "mode.changed", "lily.reply", "reminder.fired", "notification.surfaced",
+    "notification.queued", "work.digest", "dev.tests", "plan.created",
+    "calendar.upcoming", "opportunities.found", "interrupt.raised",
+}
+
+
+def _jsonable(payload) -> object:
+    """Best-effort make a bus payload JSON-serializable (datetimes etc. -> str)."""
+    try:
+        return json.loads(json.dumps(payload, default=str))
+    except (TypeError, ValueError):
+        return None
+
+
+class _Hub:
+    """Tracks connected websockets and fans bus events out to them, thread-safely."""
+
+    def __init__(self):
+        self._clients: set = set()
+        self._loop = None
+
+    async def connect(self, ws) -> None:
+        await ws.accept()
+        self._clients.add(ws)
+        self._loop = asyncio.get_running_loop()
+
+    def disconnect(self, ws) -> None:
+        self._clients.discard(ws)
+
+    async def _send_all(self, msg: dict) -> None:
+        for ws in list(self._clients):
+            try:
+                await ws.send_json(msg)
+            except Exception:
+                self.disconnect(ws)
+
+    def broadcast(self, msg: dict) -> None:
+        """Schedule a fan-out from any thread (no-op until a client + loop exist)."""
+        if self._loop is not None and self._clients:
+            asyncio.run_coroutine_threadsafe(self._send_all(msg), self._loop)
+
+
+_hub = _Hub()
+_bus_bridged = False
+
+
+def _on_bus_event(topic: str, payload: object) -> None:
+    if topic in _LIVE_TOPICS:
+        _hub.broadcast({"event": topic, "payload": _jsonable(payload)})
+
+
 def all_cards() -> dict:
     """Every card the UI renders, in one payload (used by /api/cards and the websocket)."""
     return {
@@ -105,7 +162,7 @@ def all_cards() -> dict:
 def create_app():
     """Build the FastAPI app. Raises DashboardUnavailable if FastAPI isn't installed."""
     try:
-        from fastapi import FastAPI
+        from fastapi import FastAPI, WebSocket
     except ImportError as exc:
         raise DashboardUnavailable(
             "FastAPI is not installed — run: pip install fastapi uvicorn"
@@ -141,6 +198,24 @@ def create_app():
     def _cards():
         return all_cards()
 
+    @app.websocket("/ws")
+    async def _ws(websocket: WebSocket):
+        await _hub.connect(websocket)
+        try:
+            await websocket.send_json({"event": "snapshot", "cards": all_cards()})
+            while True:
+                await websocket.receive_text()  # client pings; we just keep the socket open
+        except Exception:
+            pass
+        finally:
+            _hub.disconnect(websocket)
+
+    # Bridge the bus into the hub once (events -> connected browsers).
+    global _bus_bridged
+    if not _bus_bridged:
+        bus.subscribe("*", _on_bus_event)
+        _bus_bridged = True
+
     # Static UI (E21) — served at the root. html=True makes "/" serve index.html.
     if STATIC_DIR.is_dir():
         from fastapi.staticfiles import StaticFiles
@@ -164,7 +239,14 @@ def start_in_thread(host: str | None = None, port: int | None = None):
     app = create_app()
     host = host or DASHBOARD_HOST
     port = port or DASHBOARD_PORT
-    config = uvicorn.Config(app, host=host, port=port, log_level="warning")
+    # wsproto is a stable sans-io websocket impl; avoids version skew with the
+    # 'websockets' package on the server side. Falls back to auto if unavailable.
+    ws_impl = "wsproto"
+    try:
+        import wsproto  # noqa: F401
+    except ImportError:
+        ws_impl = "auto"
+    config = uvicorn.Config(app, host=host, port=port, log_level="warning", ws=ws_impl)
     server = uvicorn.Server(config)
 
     thread = threading.Thread(target=server.run, name="lily-dashboard", daemon=True)
