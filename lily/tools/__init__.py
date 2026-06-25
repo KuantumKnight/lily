@@ -82,6 +82,7 @@ def load_builtins() -> None:
         projects,
         recall,
         resources,
+        security,
         stt,
         system,
         tts,
