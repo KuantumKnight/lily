@@ -46,7 +46,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] E4  Push-to-talk + barge-in (interrupt her mid-sentence)
 
 ### Architecture
-- [ ] E5  Orchestrator agent (routes intent → agents)
+- [x] E5  Orchestrator agent (routes intent → agents)
 - [ ] E6  Agent bus (pub/sub, agent registration SDK)
 - [ ] E7  Planner agent (multi-step task decomposition)
 - [ ] E8  Memory layers: project memory

@@ -9,13 +9,14 @@ from rich.panel import Panel
 import time
 
 from . import (
+    agents,
     brain,
     brief,
-    engine,
     first_run,
     interrupt,
     memory,
     mic,
+    orchestrator,
     scheduler,
     stt,
     tools,
@@ -152,7 +153,7 @@ def _voice_reply(text: str) -> None:
     messages = _build_context(text)
     try:
         with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
-            reply = engine.converse(messages)
+            reply = orchestrator.handle(text, messages)
     except brain.BrainOffline as exc:
         console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
         return
@@ -224,15 +225,29 @@ def _voice_command(user_input: str) -> bool:
     return True
 
 
+def _agents_command(user_input: str) -> bool:
+    if user_input.lower() != "agents":
+        return False
+    lines = [
+        f"[bold]{a.name}[/] — {a.description}"
+        + (f" [dim](triggers: {', '.join(a.triggers)})[/]" if a.triggers else "")
+        for a in agents.all_agents()
+    ]
+    console.print(Panel("\n".join(lines) or "none", title="agents", border_style="magenta"))
+    return True
+
+
 def main() -> None:
     tools.load_builtins()
+    agents.load_builtins()
     setup_warnings = first_run.check_runtime()
     reminder_scheduler = scheduler.start_reminder_scheduler(_print_reminder)
     log.info("Lily session started (model=%s)", MODEL)
     console.print(Panel.fit("[bold magenta]Lily[/] is awake", border_style="magenta"))
     console.print(
         f"[dim]brain: {MODEL} | tools: {len(tools.schemas() or [])} | "
-        "type 'exit' to sleep | brief | transcribe | say <text> | listen | chat | voice[/]\n"
+        f"agents: {len(agents.all_agents())} | "
+        "exit | brief | transcribe | say | listen | chat | voice | agents[/]\n"
     )
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
@@ -262,12 +277,14 @@ def main() -> None:
                 continue
             if _voice_command(user_input):
                 continue
+            if _agents_command(user_input):
+                continue
 
             messages = _build_context(user_input)
 
             try:
                 with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
-                    reply = engine.converse(messages)
+                    reply = orchestrator.handle(user_input, messages)
             except brain.BrainOffline as exc:
                 console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
                 continue
