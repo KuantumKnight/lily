@@ -10,11 +10,17 @@ import subprocess
 import sys
 import threading
 import webbrowser
+from pathlib import Path
 from tkinter import BOTH, LEFT, X, Button, Frame, Label, StringVar, Tk, messagebox, ttk
 
-from . import dashboard, first_run, tools
-from .config import DASHBOARD_HOST, DASHBOARD_PORT, MODEL, ROOT
-from .log import get_logger
+if __package__ in {None, ""}:
+    package_dir = Path(__file__).resolve().parent
+    sys.path = [p for p in sys.path if Path(p or ".").resolve() != package_dir]
+    sys.path.insert(0, str(package_dir.parent))
+
+from lily import dashboard, first_run, tools
+from lily.config import DASHBOARD_HOST, DASHBOARD_PORT, MODEL, ROOT
+from lily.log import get_logger
 
 log = get_logger("desktop")
 
@@ -119,6 +125,9 @@ class LilyDesktop:
 
 
 def main() -> None:
+    if "--smoke-direct" in sys.argv:
+        print(f"http://{DASHBOARD_HOST}:{DASHBOARD_PORT}")
+        return
     LilyDesktop().run()
 
 
