@@ -7,6 +7,16 @@ if (-not (Test-Path $python)) {
     throw "Project venv not found. Create it first, then run: pip install -r requirements.txt"
 }
 
+$exe = Join-Path $root "dist\Lily\Lily.exe"
+if (Test-Path $exe) {
+    Get-CimInstance Win32_Process |
+        Where-Object { $_.ExecutablePath -eq $exe } |
+        ForEach-Object {
+            Write-Host "Stopping running Lily.exe (PID $($_.ProcessId)) before rebuild"
+            Stop-Process -Id $_.ProcessId -Force
+        }
+}
+
 & $python -m pip install pyinstaller
 & $python -m PyInstaller `
     --noconfirm `
@@ -19,6 +29,6 @@ if (-not (Test-Path $python)) {
     --hidden-import "fastapi" `
     --hidden-import "starlette" `
     --collect-submodules "lily" `
-    "lily\desktop.py"
+    "lily_desktop.py"
 
 Write-Host "Built: $root\dist\Lily\Lily.exe"
