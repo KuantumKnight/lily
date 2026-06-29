@@ -26,3 +26,8 @@ Thumbs.db
 # Models / large artifacts
 *.gguf
 *.onnx
+
+# Windows app build artifacts
+build/
+dist/
+Lily.spec

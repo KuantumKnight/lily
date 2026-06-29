@@ -31,6 +31,9 @@ python -m lily
 
 # Windows shortcut after setup
 .\lily.ps1
+
+# Windows desktop app
+.\lily-app.ps1
 ```
 
 ```
@@ -43,6 +46,18 @@ lily › ...
 Lily runs first-start checks for installed Python packages, Ollama reachability, and
 whether the configured model is pulled. Inside the REPL, type `brief` for a local daily
 brief with system status, reminders, notes, and remembered facts.
+
+The Windows desktop app opens a small Lily control window. It can start/open the local
+dashboard, launch the CLI in a separate terminal, and minimizes normally to the Windows
+taskbar. Closing the app window minimizes it; use **Quit** to exit the desktop shell.
+
+To build a standalone Windows executable:
+
+```powershell
+.\build-windows-app.ps1
+```
+
+The output is written to `dist\Lily\Lily.exe`.
 
 For local speech-to-text, install the requirements and run:
 
