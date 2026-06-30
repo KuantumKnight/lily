@@ -85,6 +85,7 @@ def load_builtins() -> None:
         notifications,
         ocr,
         opportunities,
+        panic,
         projects,
         recall,
         replay,

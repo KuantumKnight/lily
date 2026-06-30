@@ -90,7 +90,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 ### Security (Lily guards her own hoard)
 - [x] X8  Encrypted memory at rest (SQLCipher / age)
 - [x] X9  Per-agent access audit log
-- [ ] X10 Panic-wipe + local key unlock
+- [x] X10 Panic-wipe + local key unlock
 
 ### Intelligence & autonomy
 - [ ] X11 Cloud-burst reasoning — escalate only hard queries to a frontier API

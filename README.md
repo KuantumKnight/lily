@@ -125,6 +125,11 @@ database back to the local SQLite memory file.
 Every agent turn is recorded in a local audit table with agent, action, resource,
 and detail. Use `recent_audit` to inspect access history.
 
+Panic controls are guarded. `panic_wipe` only deletes local runtime memory when
+the confirmation text exactly matches `WIPE LILY MEMORY`; encrypted backups are
+kept unless you explicitly opt out. `unlock_memory` restores an encrypted memory
+database using a local age identity file.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
