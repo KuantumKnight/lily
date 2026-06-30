@@ -122,6 +122,9 @@ For encrypted memory backups, install `age`, set `LILY_AGE_RECIPIENT`, then use
 the `encrypt_memory` tool. Set `LILY_AGE_IDENTITY` to decrypt a saved `.age`
 database back to the local SQLite memory file.
 
+Every agent turn is recorded in a local audit table with agent, action, resource,
+and detail. Use `recent_audit` to inspect access history.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged

@@ -69,6 +69,7 @@ def execute(name: str, args: dict | None) -> str:
 def load_builtins() -> None:
     """Import the modules that register Lily's built-in tools."""
     from . import (  # noqa: F401
+        audit,
         brief,
         builtin,
         calendar,
