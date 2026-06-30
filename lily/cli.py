@@ -14,6 +14,7 @@ from . import (
     brain,
     brief,
     bus,
+    context,
     first_run,
     interrupt,
     memory,
@@ -45,6 +46,7 @@ SAY_PREFIX = "say "
 SCREENSHOT_WORDS = {"screenshot", "screen capture", "capture screen"}
 OCR_WORDS = {"ocr", "read screen", "screen text"}
 VISION_WORDS = {"look", "vision", "inspect screen"}
+CONTEXT_WORDS = {"context", "what am i doing", "what am i working on"}
 
 _autospeak = TTS_AUTOSPEAK
 
@@ -217,6 +219,17 @@ def _vision_command(user_input: str) -> bool:
             return True
     _print_reply(description or "No visual description returned.")
     memory.remember("user", f"[screen vision] {description}")
+    return True
+
+
+def _context_command(user_input: str) -> bool:
+    lowered = user_input.lower().strip(" ?")
+    if lowered not in CONTEXT_WORDS:
+        return False
+    with console.status("[magenta]fusing local context…[/]", spinner="dots"):
+        summary = context.snapshot(include_vision=True)
+    _print_reply(summary)
+    memory.remember("user", f"[context snapshot] {summary}")
     return True
 
 
@@ -465,6 +478,8 @@ def main() -> None:
             if _ocr_command(user_input):
                 continue
             if _vision_command(user_input):
+                continue
+            if _context_command(user_input):
                 continue
             if _listen_command(user_input):
                 continue

@@ -72,6 +72,7 @@ def load_builtins() -> None:
         brief,
         builtin,
         calendar,
+        context,
         dev,
         facts,
         git,

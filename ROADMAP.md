@@ -79,7 +79,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] X0  Screen capture (mss) — opt-in, on-demand
 - [x] X1  OCR (RapidOCR) — read text on screen
 - [x] X2  Vision model (llava / qwen-vl via Ollama) — understand UI/errors
-- [ ] X3  Context fusion — combine vision + git + active window into "what am I doing"
+- [x] X3  Context fusion — combine vision + git + active window into "what am I doing"
 
 ### Memory of a life
 - [ ] X4  Timeline store (append-only, chronological)

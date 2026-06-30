@@ -103,6 +103,10 @@ For local visual understanding, pull a vision model such as `llava:7b`, then
 type `look`, `vision`, or `inspect screen`. Lily sends the explicitly requested
 capture or image path to Ollama on your machine, not to a cloud API.
 
+For a fused "what am I doing?" snapshot, type `context` or `what am I doing`.
+Lily combines the active window title, git status, screen OCR, and local vision
+summary on demand.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
