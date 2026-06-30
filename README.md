@@ -109,6 +109,8 @@ summary on demand.
 
 Lily also maintains an append-only timeline in SQLite. Normal user/Lily turns
 are recorded chronologically, and tools can append or search timeline events.
+Ask `what was I doing last Thursday?`, `replay yesterday`, or `replay 2026-06-30`
+to query that history.
 
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized

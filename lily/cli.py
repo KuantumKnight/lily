@@ -23,6 +23,7 @@ from . import (
     notifications,
     ocr,
     orchestrator,
+    replay,
     resource_manager,
     scheduler,
     screen,
@@ -47,6 +48,7 @@ SCREENSHOT_WORDS = {"screenshot", "screen capture", "capture screen"}
 OCR_WORDS = {"ocr", "read screen", "screen text"}
 VISION_WORDS = {"look", "vision", "inspect screen"}
 CONTEXT_WORDS = {"context", "what am i doing", "what am i working on"}
+REPLAY_PREFIXES = ("replay", "what was i doing", "what did i do")
 
 _autospeak = TTS_AUTOSPEAK
 
@@ -230,6 +232,15 @@ def _context_command(user_input: str) -> bool:
         summary = context.snapshot(include_vision=True)
     _print_reply(summary)
     memory.remember("user", f"[context snapshot] {summary}")
+    return True
+
+
+def _replay_command(user_input: str) -> bool:
+    lowered = user_input.lower().strip(" ?")
+    if not lowered.startswith(REPLAY_PREFIXES):
+        return False
+    summary = replay.replay(user_input)
+    _print_reply(summary)
     return True
 
 
@@ -480,6 +491,8 @@ def main() -> None:
             if _vision_command(user_input):
                 continue
             if _context_command(user_input):
+                continue
+            if _replay_command(user_input):
                 continue
             if _listen_command(user_input):
                 continue

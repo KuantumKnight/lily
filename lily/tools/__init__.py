@@ -84,6 +84,7 @@ def load_builtins() -> None:
         opportunities,
         projects,
         recall,
+        replay,
         resources,
         screen,
         security,
