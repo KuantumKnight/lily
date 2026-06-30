@@ -115,6 +115,9 @@ to query that history.
 Decision memory stores the "why" behind choices separately from raw events. Use
 the `remember_decision` tool to save a decision, reason, and optional context.
 
+Instant retrieval can find local files and PDFs by name or text. Try `find memory
+hierarchy PDF`; PDF content search uses `pypdf` when available.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged

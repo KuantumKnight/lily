@@ -87,6 +87,7 @@ def load_builtins() -> None:
         recall,
         replay,
         resources,
+        retrieval,
         screen,
         security,
         stt,

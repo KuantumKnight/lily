@@ -20,6 +20,7 @@ REQUIRED_PACKAGES = (
     "sounddevice",
     "mss",
     "rapidocr-onnxruntime",
+    "pypdf",
 )
 
 

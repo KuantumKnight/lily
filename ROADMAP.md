@@ -85,7 +85,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] X4  Timeline store (append-only, chronological)
 - [x] X5  Life replay query ("what was I doing last Thursday?")
 - [x] X6  "Why" memory — capture decisions + reasons, not just events
-- [ ] X7  Instant retrieval ("find that PDF about memory hierarchy")
+- [x] X7  Instant retrieval ("find that PDF about memory hierarchy")
 
 ### Security (Lily guards her own hoard)
 - [ ] X8  Encrypted memory at rest (SQLCipher / age)
