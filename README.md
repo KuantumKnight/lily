@@ -99,6 +99,10 @@ To read text from the screen, type `ocr`, `read screen`, or `screen text`.
 Lily uses RapidOCR locally and only after you explicitly ask. You can also pass
 an image path to OCR an existing screenshot.
 
+For local visual understanding, pull a vision model such as `llava:7b`, then
+type `look`, `vision`, or `inspect screen`. Lily sends the explicitly requested
+capture or image path to Ollama on your machine, not to a cloud API.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
@@ -129,6 +133,7 @@ Environment variables (all optional):
 |---|---|---|
 | `LILY_MODEL` | `qwen3:8b` | Ollama model used as Lily's brain |
 | `LILY_EMBED_MODEL` | `nomic-embed-text` | Ollama model used for semantic recall |
+| `LILY_VISION_MODEL` | `llava:7b` | Ollama vision model used for local image understanding |
 | `LILY_OLLAMA_HOST` | `http://localhost:11434` | Ollama server URL |
 | `LILY_STT_MODEL` | `base` | faster-whisper model for speech-to-text |
 | `LILY_STT_DEVICE` | `cpu` | faster-whisper device, usually `cpu` or `cuda` |

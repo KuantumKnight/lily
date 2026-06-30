@@ -89,4 +89,5 @@ def load_builtins() -> None:
         stt,
         system,
         tts,
+        vision,
     )

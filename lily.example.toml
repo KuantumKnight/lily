@@ -8,6 +8,9 @@ model = "qwen3:8b"
 # Local embedding model for semantic recall (ollama pull nomic-embed-text).
 embed_model = "nomic-embed-text"
 
+# Local vision model for screenshot/image understanding (ollama pull llava:7b).
+vision_model = "llava:7b"
+
 # Where the Ollama server lives.
 ollama_host = "http://localhost:11434"
 

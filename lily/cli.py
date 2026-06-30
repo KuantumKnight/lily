@@ -28,6 +28,7 @@ from . import (
     stt,
     tools,
     tts,
+    vision,
     wake,
 )
 from .config import BARGE_IN, CONTEXT_WINDOW, DASHBOARD_ENABLE, MODEL, PUSH_TO_TALK, TTS_AUTOSPEAK
@@ -43,6 +44,7 @@ TRANSCRIBE_PREFIX = "transcribe "
 SAY_PREFIX = "say "
 SCREENSHOT_WORDS = {"screenshot", "screen capture", "capture screen"}
 OCR_WORDS = {"ocr", "read screen", "screen text"}
+VISION_WORDS = {"look", "vision", "inspect screen"}
 
 _autospeak = TTS_AUTOSPEAK
 
@@ -173,6 +175,48 @@ def _ocr_command(user_input: str) -> bool:
             return True
     _print_reply(text or "No readable text found.")
     memory.remember("user", f"[screen OCR] {text}")
+    return True
+
+
+def _vision_command(user_input: str) -> bool:
+    lowered = user_input.lower().strip()
+    if not any(
+        lowered == word or lowered.startswith(f"{word} ")
+        for word in VISION_WORDS
+    ):
+        return False
+
+    prompt = "Describe what is visible. Focus on UI state, errors, and actionable details."
+    image_path = ""
+    monitor = 1
+    try:
+        parts = shlex.split(user_input, posix=False)
+    except ValueError as exc:
+        console.print(f"[bold red]vision ›[/] {exc}")
+        return True
+    if len(parts) > 1:
+        tail = parts[-1].strip('"')
+        if tail.isdigit():
+            monitor = int(tail)
+            prompt = " ".join(parts[1:-1]).strip() or prompt
+        elif Path(tail).exists():
+            image_path = tail
+            prompt = " ".join(parts[1:-1]).strip() or prompt
+        else:
+            prompt = " ".join(parts[1:]).strip() or prompt
+
+    with console.status("[magenta]looking locally…[/]", spinner="dots"):
+        try:
+            description = vision.describe_image(
+                prompt=prompt,
+                image_path=image_path,
+                monitor=monitor,
+            )
+        except vision.VisionUnavailable as exc:
+            console.print(f"[bold red]vision ›[/] {exc}")
+            return True
+    _print_reply(description or "No visual description returned.")
+    memory.remember("user", f"[screen vision] {description}")
     return True
 
 
@@ -419,6 +463,8 @@ def main() -> None:
             if _screenshot_command(user_input):
                 continue
             if _ocr_command(user_input):
+                continue
+            if _vision_command(user_input):
                 continue
             if _listen_command(user_input):
                 continue
