@@ -89,6 +89,7 @@ def load_builtins() -> None:
         security,
         stt,
         system,
+        timeline,
         tts,
         vision,
     )

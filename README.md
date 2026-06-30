@@ -107,6 +107,9 @@ For a fused "what am I doing?" snapshot, type `context` or `what am I doing`.
 Lily combines the active window title, git status, screen OCR, and local vision
 summary on demand.
 
+Lily also maintains an append-only timeline in SQLite. Normal user/Lily turns
+are recorded chronologically, and tools can append or search timeline events.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged

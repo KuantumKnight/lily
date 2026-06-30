@@ -82,7 +82,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] X3  Context fusion — combine vision + git + active window into "what am I doing"
 
 ### Memory of a life
-- [ ] X4  Timeline store (append-only, chronological)
+- [x] X4  Timeline store (append-only, chronological)
 - [ ] X5  Life replay query ("what was I doing last Thursday?")
 - [ ] X6  "Why" memory — capture decisions + reasons, not just events
 - [ ] X7  Instant retrieval ("find that PDF about memory hierarchy")
