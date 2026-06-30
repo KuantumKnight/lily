@@ -75,6 +75,7 @@ def load_builtins() -> None:
         context,
         decisions,
         dev,
+        encryption,
         facts,
         git,
         habits,

@@ -21,6 +21,7 @@ DATA_DIR.mkdir(exist_ok=True)
 DB_PATH = DATA_DIR / "lily.db"
 LOG_PATH = DATA_DIR / "lily.log"
 SCREENSHOT_DIR = DATA_DIR / "screenshots"
+ENCRYPTED_DB_PATH = DATA_DIR / "lily.db.age"
 
 CONFIG_PATH = Path(os.environ.get("LILY_CONFIG", ROOT / "lily.toml"))
 
@@ -54,6 +55,9 @@ _DEFAULTS: dict = {
     "dashboard_port": 8000,
     "dashboard_enable": False,
     "screenshot_dir": str(SCREENSHOT_DIR),
+    "encrypted_db_path": str(ENCRYPTED_DB_PATH),
+    "age_recipient": "",
+    "age_identity": "",
 }
 
 
@@ -127,3 +131,6 @@ DASHBOARD_HOST = _get("dashboard_host")
 DASHBOARD_PORT = _get("dashboard_port", int)
 DASHBOARD_ENABLE = _get("dashboard_enable", _to_bool)
 SCREENSHOT_DIR = _get("screenshot_dir", _to_path)
+ENCRYPTED_DB_PATH = _get("encrypted_db_path", _to_path)
+AGE_RECIPIENT = _get("age_recipient")
+AGE_IDENTITY = _get("age_identity")

@@ -88,7 +88,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] X7  Instant retrieval ("find that PDF about memory hierarchy")
 
 ### Security (Lily guards her own hoard)
-- [ ] X8  Encrypted memory at rest (SQLCipher / age)
+- [x] X8  Encrypted memory at rest (SQLCipher / age)
 - [ ] X9  Per-agent access audit log
 - [ ] X10 Panic-wipe + local key unlock
 

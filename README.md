@@ -118,6 +118,10 @@ the `remember_decision` tool to save a decision, reason, and optional context.
 Instant retrieval can find local files and PDFs by name or text. Try `find memory
 hierarchy PDF`; PDF content search uses `pypdf` when available.
 
+For encrypted memory backups, install `age`, set `LILY_AGE_RECIPIENT`, then use
+the `encrypt_memory` tool. Set `LILY_AGE_IDENTITY` to decrypt a saved `.age`
+database back to the local SQLite memory file.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
@@ -160,6 +164,9 @@ Environment variables (all optional):
 | `LILY_BARGE_IN` | `true` | let a keypress interrupt Lily mid-sentence |
 | `LILY_PUSH_TO_TALK` | `false` | gate each voice turn behind a keypress |
 | `LILY_SCREENSHOT_DIR` | `data/screenshots` | where explicit screen captures are saved |
+| `LILY_ENCRYPTED_DB_PATH` | `data/lily.db.age` | encrypted SQLite memory backup path |
+| `LILY_AGE_RECIPIENT` | _(unset)_ | age public recipient used to encrypt memory |
+| `LILY_AGE_IDENTITY` | _(unset)_ | age identity file used to decrypt memory |
 
 ## Philosophy
 
