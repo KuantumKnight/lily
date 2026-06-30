@@ -19,6 +19,7 @@ REQUIRED_PACKAGES = (
     "openwakeword",
     "sounddevice",
     "mss",
+    "rapidocr-onnxruntime",
 )
 
 

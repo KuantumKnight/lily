@@ -95,6 +95,10 @@ Lily writes a PNG under `data/screenshots` by default. She never captures the
 screen in the background; capture is on-demand only. Use `screenshot 0` to grab
 the virtual monitor spanning all displays.
 
+To read text from the screen, type `ocr`, `read screen`, or `screen text`.
+Lily uses RapidOCR locally and only after you explicitly ask. You can also pass
+an image path to OCR an existing screenshot.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged

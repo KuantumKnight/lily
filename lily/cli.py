@@ -1,6 +1,7 @@
 """The terminal REPL — talk to Lily. This is where she comes alive."""
 
 import shlex
+from pathlib import Path
 
 from rich.console import Console
 from rich.markdown import Markdown
@@ -19,6 +20,7 @@ from . import (
     mic,
     mode as mode_module,
     notifications,
+    ocr,
     orchestrator,
     resource_manager,
     scheduler,
@@ -40,6 +42,7 @@ BRIEF_WORDS = {"brief", "daily brief", "what's up today", "whats up today"}
 TRANSCRIBE_PREFIX = "transcribe "
 SAY_PREFIX = "say "
 SCREENSHOT_WORDS = {"screenshot", "screen capture", "capture screen"}
+OCR_WORDS = {"ocr", "read screen", "screen text"}
 
 _autospeak = TTS_AUTOSPEAK
 
@@ -140,6 +143,36 @@ def _screenshot_command(user_input: str) -> bool:
             return True
     console.print(f"[dim]screenshot › {path}[/]")
     memory.remember("user", f"[screen captured] {path}")
+    return True
+
+
+def _ocr_command(user_input: str) -> bool:
+    lowered = user_input.lower().strip()
+    if not any(lowered == word or lowered.startswith(f"{word} ") for word in OCR_WORDS):
+        return False
+
+    image_path = ""
+    monitor = 1
+    try:
+        parts = shlex.split(user_input, posix=False)
+    except ValueError as exc:
+        console.print(f"[bold red]ocr ›[/] {exc}")
+        return True
+    if len(parts) > 1:
+        tail = parts[-1].strip('"')
+        if tail.isdigit():
+            monitor = int(tail)
+        elif Path(tail).exists():
+            image_path = tail
+
+    with console.status("[magenta]reading screen text…[/]", spinner="dots"):
+        try:
+            text = ocr.read_text(image_path=image_path, monitor=monitor)
+        except ocr.OCRUnavailable as exc:
+            console.print(f"[bold red]ocr ›[/] {exc}")
+            return True
+    _print_reply(text or "No readable text found.")
+    memory.remember("user", f"[screen OCR] {text}")
     return True
 
 
@@ -384,6 +417,8 @@ def main() -> None:
             if _say_command(user_input):
                 continue
             if _screenshot_command(user_input):
+                continue
+            if _ocr_command(user_input):
                 continue
             if _listen_command(user_input):
                 continue
