@@ -90,6 +90,11 @@ While she's speaking, press any key to **barge in** — she stops mid-sentence s
 you can talk over her. Set `push_to_talk = true` to gate each turn behind a
 keypress instead of voice-activated recording.
 
+For opt-in screen capture, type `screenshot` or `capture screen` in the REPL.
+Lily writes a PNG under `data/screenshots` by default. She never captures the
+screen in the background; capture is on-demand only. Use `screenshot 0` to grab
+the virtual monitor spanning all displays.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
@@ -130,6 +135,7 @@ Environment variables (all optional):
 | `LILY_WAKE_THRESHOLD` | `0.5` | wake-word detection confidence (0–1) |
 | `LILY_BARGE_IN` | `true` | let a keypress interrupt Lily mid-sentence |
 | `LILY_PUSH_TO_TALK` | `false` | gate each voice turn behind a keypress |
+| `LILY_SCREENSHOT_DIR` | `data/screenshots` | where explicit screen captures are saved |
 
 ## Philosophy
 

@@ -76,7 +76,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 ## v3 — Lily Prime (Effort Pro)
 
 ### Eyes
-- [ ] X0  Screen capture (mss) — opt-in, on-demand
+- [x] X0  Screen capture (mss) — opt-in, on-demand
 - [ ] X1  OCR (RapidOCR) — read text on screen
 - [ ] X2  Vision model (llava / qwen-vl via Ollama) — understand UI/errors
 - [ ] X3  Context fusion — combine vision + git + active window into "what am I doing"

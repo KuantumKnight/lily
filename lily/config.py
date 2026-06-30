@@ -20,6 +20,7 @@ DATA_DIR.mkdir(exist_ok=True)
 
 DB_PATH = DATA_DIR / "lily.db"
 LOG_PATH = DATA_DIR / "lily.log"
+SCREENSHOT_DIR = DATA_DIR / "screenshots"
 
 CONFIG_PATH = Path(os.environ.get("LILY_CONFIG", ROOT / "lily.toml"))
 
@@ -51,6 +52,7 @@ _DEFAULTS: dict = {
     "dashboard_host": "127.0.0.1",
     "dashboard_port": 8000,
     "dashboard_enable": False,
+    "screenshot_dir": str(SCREENSHOT_DIR),
 }
 
 
@@ -77,6 +79,12 @@ def _to_list(value) -> list[str]:
     if isinstance(value, (list, tuple)):
         return [str(v).strip() for v in value if str(v).strip()]
     return [part.strip() for part in str(value).replace("\n", ",").split(",") if part.strip()]
+
+
+def _to_path(value) -> Path:
+    """Resolve relative config paths from the repo root, not the launch directory."""
+    path = Path(value).expanduser()
+    return path if path.is_absolute() else ROOT / path
 
 
 def _get(key: str, cast=str):
@@ -116,3 +124,4 @@ RSS_FEEDS = _get("rss_feeds", _to_list)
 DASHBOARD_HOST = _get("dashboard_host")
 DASHBOARD_PORT = _get("dashboard_port", int)
 DASHBOARD_ENABLE = _get("dashboard_enable", _to_bool)
+SCREENSHOT_DIR = _get("screenshot_dir", _to_path)

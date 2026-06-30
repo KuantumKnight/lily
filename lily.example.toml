@@ -40,3 +40,7 @@ mic_max_seconds = 15.0
 # each turn behind a keypress instead of voice-activated recording.
 barge_in = true
 push_to_talk = false
+
+# On-demand screenshots for the Prime vision layer. Captures are only taken when
+# explicitly requested and are written under gitignored runtime data by default.
+screenshot_dir = "data/screenshots"

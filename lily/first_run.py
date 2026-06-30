@@ -18,6 +18,7 @@ REQUIRED_PACKAGES = (
     "piper-tts",
     "openwakeword",
     "sounddevice",
+    "mss",
 )
 
 

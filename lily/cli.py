@@ -22,6 +22,7 @@ from . import (
     orchestrator,
     resource_manager,
     scheduler,
+    screen,
     stt,
     tools,
     tts,
@@ -38,6 +39,7 @@ EXIT_WORDS = {"exit", "quit", "bye", "sleep"}
 BRIEF_WORDS = {"brief", "daily brief", "what's up today", "whats up today"}
 TRANSCRIBE_PREFIX = "transcribe "
 SAY_PREFIX = "say "
+SCREENSHOT_WORDS = {"screenshot", "screen capture", "capture screen"}
 
 _autospeak = TTS_AUTOSPEAK
 
@@ -110,6 +112,34 @@ def _say_command(user_input: str) -> bool:
     if text:
         with console.status("[magenta]Lily is speaking…[/]", spinner="dots"):
             _speak(text)
+    return True
+
+
+def _screenshot_command(user_input: str) -> bool:
+    lowered = user_input.lower().strip()
+    if not any(
+        lowered == word or lowered.startswith(f"{word} ")
+        for word in SCREENSHOT_WORDS
+    ):
+        return False
+
+    monitor = 1
+    try:
+        parts = shlex.split(user_input, posix=False)
+    except ValueError as exc:
+        console.print(f"[bold red]screenshot ›[/] {exc}")
+        return True
+    if len(parts) > 1 and parts[-1].isdigit():
+        monitor = int(parts[-1])
+
+    with console.status("[magenta]capturing screen…[/]", spinner="dots"):
+        try:
+            path = screen.capture_screen(monitor=monitor)
+        except screen.ScreenCaptureUnavailable as exc:
+            console.print(f"[bold red]screenshot ›[/] {exc}")
+            return True
+    console.print(f"[dim]screenshot › {path}[/]")
+    memory.remember("user", f"[screen captured] {path}")
     return True
 
 
@@ -352,6 +382,8 @@ def main() -> None:
             if _transcribe_command(user_input):
                 continue
             if _say_command(user_input):
+                continue
+            if _screenshot_command(user_input):
                 continue
             if _listen_command(user_input):
                 continue
