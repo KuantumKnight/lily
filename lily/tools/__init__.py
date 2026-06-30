@@ -73,6 +73,7 @@ def load_builtins() -> None:
         builtin,
         calendar,
         context,
+        decisions,
         dev,
         facts,
         git,
