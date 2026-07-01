@@ -74,6 +74,7 @@ def load_builtins() -> None:
         builtin,
         calendar,
         cloud,
+        coordination,
         context,
         decisions,
         dev,
