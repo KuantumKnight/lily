@@ -95,7 +95,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 ### Intelligence & autonomy
 - [x] X11 Cloud-burst reasoning — escalate only hard queries to a frontier API
 - [x] X12 Adaptive dashboard engine (cards appear/vanish by usage)
-- [ ] X13 Anti-distraction agent (negotiates, protects focus blocks)
+- [x] X13 Anti-distraction agent (negotiates, protects focus blocks)
 - [ ] X14 Feedback agent (👍/👎 → real preference model, not a counter)
 - [ ] X15 Multi-agent coordination (agents collaborate on a goal)
 - [ ] X16 Predictive assistance (anticipate next step from patterns)

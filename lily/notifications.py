@@ -13,7 +13,7 @@ import threading
 import time
 from dataclasses import dataclass
 
-from . import bus
+from . import bus, focus
 from . import mode as mode_module
 from .log import get_logger
 from .priority import Priority, coerce
@@ -89,6 +89,9 @@ def clear() -> None:
 
 def _on_mode_changed(topic: str, payload: object) -> None:
     if isinstance(payload, dict) and payload.get("mode") == mode_module.MODE_ACTIVE:
+        if focus.active():
+            log.info("focus block active; keeping notifications batched")
+            return
         flush(reason="entered active mode")
 
 

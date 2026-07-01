@@ -79,6 +79,7 @@ def load_builtins() -> None:
         dev,
         encryption,
         facts,
+        focus,
         git,
         habits,
         mode,

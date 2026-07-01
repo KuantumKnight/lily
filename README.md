@@ -137,6 +137,10 @@ chat-completions endpoint, model, and API-key environment variable, then use the
 The dashboard can adapt its card set. Status and system cards stay visible;
 memory/work cards appear once Lily has relevant data.
 
+The focus agent protects deep work. Start a block with `start_focus` or phrases
+like "protect my focus for 45 minutes"; normal/low notifications remain batched
+until focus ends, while high/emergency notifications still surface.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
