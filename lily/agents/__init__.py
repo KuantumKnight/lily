@@ -61,4 +61,5 @@ def load_builtins() -> None:
         git,
         opportunities,
         planner,
+        predict,
     )

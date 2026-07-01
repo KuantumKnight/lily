@@ -90,6 +90,7 @@ def load_builtins() -> None:
         ocr,
         opportunities,
         panic,
+        predict,
         projects,
         recall,
         replay,

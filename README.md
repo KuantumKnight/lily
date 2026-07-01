@@ -149,6 +149,9 @@ Multi-agent coordination lets specialized agents collaborate on one goal. Use
 `coordinate_agents` with optional comma-separated agent names, or ask Lily to
 coordinate agents on a task.
 
+Predictive assistance suggests likely next steps from local timeline and project
+patterns. Ask "what next?" or use `predict_next`.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
