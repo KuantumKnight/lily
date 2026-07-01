@@ -141,6 +141,10 @@ The focus agent protects deep work. Start a block with `start_focus` or phrases
 like "protect my focus for 45 minutes"; normal/low notifications remain batched
 until focus ends, while high/emergency notifications still surface.
 
+Feedback updates a preference model. Use `record_feedback` with up/down plus a
+reason; Lily extracts weighted preference signals you can inspect with
+`feedback_preferences`.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
