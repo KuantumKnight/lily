@@ -134,6 +134,9 @@ Cloud burst is disabled by default. To opt in, configure an OpenAI-compatible
 chat-completions endpoint, model, and API-key environment variable, then use the
 `cloud_burst` tool for hard queries only.
 
+The dashboard can adapt its card set. Status and system cards stay visible;
+memory/work cards appear once Lily has relevant data.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
@@ -183,6 +186,7 @@ Environment variables (all optional):
 | `LILY_CLOUD_BURST_URL` | _(unset)_ | OpenAI-compatible chat-completions URL |
 | `LILY_CLOUD_BURST_MODEL` | `gpt-4.1` | frontier model name |
 | `LILY_CLOUD_BURST_KEY_ENV` | `OPENAI_API_KEY` | env var containing the API key |
+| `LILY_DASHBOARD_ADAPTIVE` | `true` | hide dashboard cards until they have useful data |
 
 ## Philosophy
 

@@ -17,10 +17,10 @@ from pathlib import Path
 
 import psutil
 
-from . import agents, brief, bus, memory
+from . import adaptive_dashboard, agents, brief, bus, memory
 from . import mode as mode_module
 from . import tools
-from .config import DASHBOARD_HOST, DASHBOARD_PORT
+from .config import DASHBOARD_ADAPTIVE, DASHBOARD_HOST, DASHBOARD_PORT
 from .log import get_logger
 
 log = get_logger("dashboard")
@@ -148,13 +148,14 @@ def _on_bus_event(topic: str, payload: object) -> None:
 
 def all_cards() -> dict:
     """Every card the UI renders, in one payload (used by /api/cards and the websocket)."""
-    return {
+    cards = {
         "status": status_card(),
         "system": system_card(),
         "habits": habits_card(),
         "facts": memory_facts_card(10),
         "projects": memory_projects_card(),
     }
+    return adaptive_dashboard.select(cards) if DASHBOARD_ADAPTIVE else cards
 
 
 # ---- app ----------------------------------------------------------------------

@@ -58,3 +58,6 @@ cloud_burst_enabled = false
 cloud_burst_url = ""
 cloud_burst_model = "gpt-4.1"
 cloud_burst_key_env = "OPENAI_API_KEY"
+
+# Let the dashboard show/hide cards based on current local data.
+dashboard_adaptive = true

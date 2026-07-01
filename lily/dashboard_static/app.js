@@ -58,6 +58,10 @@ function renderFacts(d) {
 
 function renderAll(cards) {
   if (!cards) return;
+  ["status", "system", "habits", "projects", "facts"].forEach((name) => {
+    const el = $(`card-${name}`);
+    if (el) el.hidden = !cards[name];
+  });
   renderStatus(cards.status);
   renderSystem(cards.system);
   renderHabits(cards.habits);

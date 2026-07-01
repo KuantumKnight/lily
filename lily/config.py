@@ -54,6 +54,7 @@ _DEFAULTS: dict = {
     "dashboard_host": "127.0.0.1",
     "dashboard_port": 8000,
     "dashboard_enable": False,
+    "dashboard_adaptive": True,
     "screenshot_dir": str(SCREENSHOT_DIR),
     "encrypted_db_path": str(ENCRYPTED_DB_PATH),
     "age_recipient": "",
@@ -134,6 +135,7 @@ RSS_FEEDS = _get("rss_feeds", _to_list)
 DASHBOARD_HOST = _get("dashboard_host")
 DASHBOARD_PORT = _get("dashboard_port", int)
 DASHBOARD_ENABLE = _get("dashboard_enable", _to_bool)
+DASHBOARD_ADAPTIVE = _get("dashboard_adaptive", _to_bool)
 SCREENSHOT_DIR = _get("screenshot_dir", _to_path)
 ENCRYPTED_DB_PATH = _get("encrypted_db_path", _to_path)
 AGE_RECIPIENT = _get("age_recipient")
