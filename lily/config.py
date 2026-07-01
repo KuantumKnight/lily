@@ -58,6 +58,10 @@ _DEFAULTS: dict = {
     "encrypted_db_path": str(ENCRYPTED_DB_PATH),
     "age_recipient": "",
     "age_identity": "",
+    "cloud_burst_enabled": False,
+    "cloud_burst_url": "",
+    "cloud_burst_model": "gpt-4.1",
+    "cloud_burst_key_env": "OPENAI_API_KEY",
 }
 
 
@@ -134,3 +138,7 @@ SCREENSHOT_DIR = _get("screenshot_dir", _to_path)
 ENCRYPTED_DB_PATH = _get("encrypted_db_path", _to_path)
 AGE_RECIPIENT = _get("age_recipient")
 AGE_IDENTITY = _get("age_identity")
+CLOUD_BURST_ENABLED = _get("cloud_burst_enabled", _to_bool)
+CLOUD_BURST_URL = _get("cloud_burst_url")
+CLOUD_BURST_MODEL = _get("cloud_burst_model")
+CLOUD_BURST_KEY_ENV = _get("cloud_burst_key_env")

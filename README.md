@@ -130,6 +130,10 @@ the confirmation text exactly matches `WIPE LILY MEMORY`; encrypted backups are
 kept unless you explicitly opt out. `unlock_memory` restores an encrypted memory
 database using a local age identity file.
 
+Cloud burst is disabled by default. To opt in, configure an OpenAI-compatible
+chat-completions endpoint, model, and API-key environment variable, then use the
+`cloud_burst` tool for hard queries only.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
@@ -175,6 +179,10 @@ Environment variables (all optional):
 | `LILY_ENCRYPTED_DB_PATH` | `data/lily.db.age` | encrypted SQLite memory backup path |
 | `LILY_AGE_RECIPIENT` | _(unset)_ | age public recipient used to encrypt memory |
 | `LILY_AGE_IDENTITY` | _(unset)_ | age identity file used to decrypt memory |
+| `LILY_CLOUD_BURST_ENABLED` | `false` | enable explicit frontier API escalation |
+| `LILY_CLOUD_BURST_URL` | _(unset)_ | OpenAI-compatible chat-completions URL |
+| `LILY_CLOUD_BURST_MODEL` | `gpt-4.1` | frontier model name |
+| `LILY_CLOUD_BURST_KEY_ENV` | `OPENAI_API_KEY` | env var containing the API key |
 
 ## Philosophy
 

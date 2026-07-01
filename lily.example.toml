@@ -52,3 +52,9 @@ screenshot_dir = "data/screenshots"
 encrypted_db_path = "data/lily.db.age"
 age_recipient = ""
 age_identity = ""
+
+# Explicit, opt-in cloud burst for hard queries only.
+cloud_burst_enabled = false
+cloud_burst_url = ""
+cloud_burst_model = "gpt-4.1"
+cloud_burst_key_env = "OPENAI_API_KEY"
