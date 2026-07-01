@@ -98,6 +98,7 @@ def load_builtins() -> None:
         retrieval,
         screen,
         security,
+        session_state,
         stt,
         system,
         timeline,

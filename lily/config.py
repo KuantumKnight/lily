@@ -22,6 +22,7 @@ DB_PATH = DATA_DIR / "lily.db"
 LOG_PATH = DATA_DIR / "lily.log"
 SCREENSHOT_DIR = DATA_DIR / "screenshots"
 ENCRYPTED_DB_PATH = DATA_DIR / "lily.db.age"
+SESSION_STATE_PATH = DATA_DIR / "session_state.json"
 
 CONFIG_PATH = Path(os.environ.get("LILY_CONFIG", ROOT / "lily.toml"))
 
@@ -57,6 +58,7 @@ _DEFAULTS: dict = {
     "dashboard_adaptive": True,
     "screenshot_dir": str(SCREENSHOT_DIR),
     "encrypted_db_path": str(ENCRYPTED_DB_PATH),
+    "session_state_path": str(SESSION_STATE_PATH),
     "age_recipient": "",
     "age_identity": "",
     "cloud_burst_enabled": False,
@@ -104,7 +106,7 @@ def _get(key: str, cast=str):
         return cast(env)
     if key in _FILE:
         return cast(_FILE[key])
-    return _DEFAULTS[key]
+    return cast(_DEFAULTS[key])
 
 
 MODEL = _get("model")
@@ -138,6 +140,7 @@ DASHBOARD_ENABLE = _get("dashboard_enable", _to_bool)
 DASHBOARD_ADAPTIVE = _get("dashboard_adaptive", _to_bool)
 SCREENSHOT_DIR = _get("screenshot_dir", _to_path)
 ENCRYPTED_DB_PATH = _get("encrypted_db_path", _to_path)
+SESSION_STATE_PATH = _get("session_state_path", _to_path)
 AGE_RECIPIENT = _get("age_recipient")
 AGE_IDENTITY = _get("age_identity")
 CLOUD_BURST_ENABLED = _get("cloud_burst_enabled", _to_bool)

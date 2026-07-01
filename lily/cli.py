@@ -28,6 +28,7 @@ from . import (
     resource_manager,
     scheduler,
     screen,
+    session_state,
     stt,
     tools,
     tts,
@@ -464,6 +465,7 @@ def main() -> None:
     bus.subscribe("notification.surfaced", _print_surfaced)
     if DASHBOARD_ENABLE:
         _dashboard_command("dashboard")
+    restored = session_state.restore_summary()
     setup_warnings = first_run.check_runtime()
     reminder_scheduler = scheduler.start_reminder_scheduler(_print_reminder)
     log.info("Lily session started (model=%s)", MODEL)
@@ -473,6 +475,8 @@ def main() -> None:
         f"agents: {len(agents.all_agents())} | mode: {mode_module.current()} | "
         "exit | brief | listen | chat | voice | mode | notifications | dashboard | agents[/]\n"
     )
+    if restored:
+        console.print(f"[dim]wake › {restored}[/]")
     for warning in setup_warnings:
         console.print(f"[yellow]setup ›[/] {warning}")
     if setup_warnings:
@@ -536,6 +540,10 @@ def main() -> None:
             if _autospeak and reply:
                 _speak(reply)
     finally:
+        try:
+            session_state.save("cli exit")
+        except Exception as exc:
+            log.warning("session state save failed: %s", exc)
         if reminder_scheduler is not None:
             reminder_scheduler.shutdown(wait=False)
             log.info("reminder scheduler stopped")

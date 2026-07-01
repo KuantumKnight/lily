@@ -50,6 +50,7 @@ screenshot_dir = "data/screenshots"
 
 # Encrypted memory-at-rest backups via the age CLI.
 encrypted_db_path = "data/lily.db.age"
+session_state_path = "data/session_state.json"
 age_recipient = ""
 age_identity = ""
 

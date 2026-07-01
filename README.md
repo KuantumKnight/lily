@@ -152,6 +152,10 @@ coordinate agents on a task.
 Predictive assistance suggests likely next steps from local timeline and project
 patterns. Ask "what next?" or use `predict_next`.
 
+Sleep/wake state is saved under `data/session_state.json` when Lily exits and
+summarized on the next startup. Use `save_session_state` and `wake_state` to
+inspect or refresh it manually.
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
@@ -195,6 +199,7 @@ Environment variables (all optional):
 | `LILY_PUSH_TO_TALK` | `false` | gate each voice turn behind a keypress |
 | `LILY_SCREENSHOT_DIR` | `data/screenshots` | where explicit screen captures are saved |
 | `LILY_ENCRYPTED_DB_PATH` | `data/lily.db.age` | encrypted SQLite memory backup path |
+| `LILY_SESSION_STATE_PATH` | `data/session_state.json` | saved sleep/wake state snapshot |
 | `LILY_AGE_RECIPIENT` | _(unset)_ | age public recipient used to encrypt memory |
 | `LILY_AGE_IDENTITY` | _(unset)_ | age identity file used to decrypt memory |
 | `LILY_CLOUD_BURST_ENABLED` | `false` | enable explicit frontier API escalation |

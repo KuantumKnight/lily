@@ -99,7 +99,7 @@ SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitP
 - [x] X14 Feedback agent (👍/👎 → real preference model, not a counter)
 - [x] X15 Multi-agent coordination (agents collaborate on a goal)
 - [x] X16 Predictive assistance (anticipate next step from patterns)
-- [ ] X17 Sleep/Wake full state preservation across reboots
+- [x] X17 Sleep/Wake full state preservation across reboots
 
 ---
 
