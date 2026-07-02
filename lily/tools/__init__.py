@@ -7,6 +7,7 @@ This is the foundation every future agent plugs into: a "skill" is just a regist
 """
 
 import inspect
+import importlib
 from collections.abc import Callable
 
 from ..log import get_logger
@@ -66,42 +67,49 @@ def execute(name: str, args: dict | None) -> str:
         return f"[error] {name} failed: {exc}"
 
 
+_BUILTIN_MODULES = (
+    "audit",
+    "brief",
+    "builtin",
+    "calendar",
+    "cloud",
+    "coordination",
+    "context",
+    "decisions",
+    "dev",
+    "encryption",
+    "facts",
+    "feedback",
+    "focus",
+    "git",
+    "habits",
+    "mode",
+    "notes",
+    "notifications",
+    "ocr",
+    "opportunities",
+    "panic",
+    "predict",
+    "projects",
+    "recall",
+    "replay",
+    "resources",
+    "retrieval",
+    "screen",
+    "security",
+    "session_state",
+    "stt",
+    "system",
+    "timeline",
+    "tts",
+    "vision",
+)
+
+
 def load_builtins() -> None:
-    """Import the modules that register Lily's built-in tools."""
-    from . import (  # noqa: F401
-        audit,
-        brief,
-        builtin,
-        calendar,
-        cloud,
-        coordination,
-        context,
-        decisions,
-        dev,
-        encryption,
-        facts,
-        feedback,
-        focus,
-        git,
-        habits,
-        mode,
-        notes,
-        notifications,
-        ocr,
-        opportunities,
-        panic,
-        predict,
-        projects,
-        recall,
-        replay,
-        resources,
-        retrieval,
-        screen,
-        security,
-        session_state,
-        stt,
-        system,
-        timeline,
-        tts,
-        vision,
-    )
+    """Import modules that register built-in tools, skipping missing optional deps."""
+    for name in _BUILTIN_MODULES:
+        try:
+            importlib.import_module(f"{__name__}.{name}")
+        except ImportError as exc:
+            log.warning("skipped tool module %s: %s", name, exc)
