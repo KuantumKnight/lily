@@ -8,6 +8,7 @@ This module is the registration SDK other features build on: ``register`` an
 :class:`Agent`, give it ``triggers`` for fast routing, and it joins the roster.
 """
 
+import importlib
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -50,16 +51,23 @@ def all_agents() -> list["Agent"]:
     return list(_REGISTRY.values())
 
 
+_BUILTIN_MODULES = (
+    "calendar",
+    "conversation",
+    "coordinator",
+    "dev",
+    "focus",
+    "git",
+    "opportunities",
+    "planner",
+    "predict",
+)
+
+
 def load_builtins() -> None:
-    """Import the modules that register Lily's built-in agents."""
-    from . import (  # noqa: F401
-        calendar,
-        conversation,
-        coordinator,
-        dev,
-        focus,
-        git,
-        opportunities,
-        planner,
-        predict,
-    )
+    """Import modules that register Lily's built-in agents."""
+    for name in _BUILTIN_MODULES:
+        try:
+            importlib.import_module(f"{__name__}.{name}")
+        except ImportError as exc:
+            log.warning("skipped agent module %s: %s", name, exc)
