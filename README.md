@@ -162,7 +162,7 @@ commands such as `ollama` and `age`.
 For a quick non-destructive stabilization check, run:
 
 ```powershell
-python scripts/smoke_check.py
+.\smoke-check.ps1
 ```
 
 Every request flows through an **orchestrator** that routes it to the right
