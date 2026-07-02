@@ -17,15 +17,24 @@ def _normalise_tool_calls(raw) -> list[dict]:
     """Convert the model's tool_calls into plain dicts we can replay back to it."""
     out = []
     for call in raw:
+        name, args = _tool_call_name_args(call)
         out.append(
             {
                 "function": {
-                    "name": call.function.name,
-                    "arguments": dict(call.function.arguments or {}),
+                    "name": name,
+                    "arguments": args,
                 }
             }
         )
     return out
+
+
+def _tool_call_name_args(call) -> tuple[str, dict]:
+    """Support both object-style and dict-style Ollama tool calls."""
+    if isinstance(call, dict):
+        fn = call.get("function") or {}
+        return str(fn.get("name") or ""), dict(fn.get("arguments") or {})
+    return str(call.function.name), dict(call.function.arguments or {})
 
 
 def converse(messages: list[dict]) -> str:
@@ -48,8 +57,7 @@ def converse(messages: list[dict]) -> str:
             }
         )
         for call in tool_calls:
-            name = call.function.name
-            args = dict(call.function.arguments or {})
+            name, args = _tool_call_name_args(call)
             result = tools.execute(name, args)
             log.info("tool %s(%s) -> %s", name, args, result[:200])
             messages.append({"role": "tool", "name": name, "content": result})
