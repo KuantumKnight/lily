@@ -18,7 +18,7 @@ def main() -> int:
     ok = True
     ok = compileall.compile_dir(str(ROOT / "lily"), quiet=1) and ok
 
-    from lily import agents, health, session_state, tools
+    from lily import agents, config, health, session_state, tools
     from lily.engine import _normalise_tool_calls
 
     tools.load_builtins()
@@ -32,6 +32,10 @@ def main() -> int:
         )[0]["function"]["name"] == "get_datetime",
         "health_report": health.report().startswith("Runtime health:"),
         "wake_state": isinstance(session_state.restore_summary(), str),
+        "config_paths": all(
+            hasattr(path, "exists")
+            for path in (config.SCREENSHOT_DIR, config.ENCRYPTED_DB_PATH, config.SESSION_STATE_PATH)
+        ),
     }
 
     for name, passed in checks.items():
