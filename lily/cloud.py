@@ -4,6 +4,7 @@ import json
 import os
 import urllib.error
 import urllib.request
+from urllib.parse import urlparse
 
 from .config import (
     CLOUD_BURST_ENABLED,
@@ -43,6 +44,7 @@ def ask(query: str, context: str = "", force: bool = False) -> str:
         raise CloudBurstUnavailable("query does not look hard enough for cloud burst")
     if not CLOUD_BURST_URL:
         raise CloudBurstUnavailable("set cloud_burst_url to an OpenAI-compatible endpoint")
+    _validate_url(CLOUD_BURST_URL)
     key = os.environ.get(CLOUD_BURST_KEY_ENV) if CLOUD_BURST_KEY_ENV else ""
     if not key:
         raise CloudBurstUnavailable(f"set API key in environment variable {CLOUD_BURST_KEY_ENV}")
@@ -88,3 +90,12 @@ def _prompt(query: str, context: str) -> str:
     if not context.strip():
         return query
     return f"Local context:\n{context.strip()}\n\nHard query:\n{query.strip()}"
+
+
+def _validate_url(url: str) -> None:
+    parsed = urlparse(url)
+    if parsed.scheme == "https":
+        return
+    if parsed.scheme == "http" and parsed.hostname in {"127.0.0.1", "localhost", "::1"}:
+        return
+    raise CloudBurstUnavailable("cloud_burst_url must use https unless it is localhost")
