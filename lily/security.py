@@ -66,7 +66,19 @@ def detect_secrets(text: str) -> list[Finding]:
     return findings
 
 
-_SKIP_DIRS = {".git", ".venv", "venv", "__pycache__", "node_modules", "data", ".idea", ".vscode"}
+_SKIP_DIRS = {
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "node_modules",
+    "data",
+    ".idea",
+    ".vscode",
+    ".claude",
+    "build",
+    "dist",
+}
 _MAX_BYTES = 1_000_000
 
 
@@ -77,7 +89,8 @@ def scan_repo(root) -> list[tuple[str, Finding]]:
     for path in root.rglob("*"):
         if not path.is_file():
             continue
-        if any(part in _SKIP_DIRS for part in path.parts):
+        rel_parts = path.relative_to(root).parts
+        if any(part in _SKIP_DIRS or part.startswith(".") for part in rel_parts):
             continue
         try:
             if path.stat().st_size > _MAX_BYTES:
