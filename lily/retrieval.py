@@ -7,6 +7,7 @@ from .config import DATA_DIR, ROOT
 SEARCH_ROOTS = (ROOT, DATA_DIR)
 TEXT_SUFFIXES = {".txt", ".md", ".toml", ".py", ".json", ".csv", ".log"}
 PDF_SUFFIX = ".pdf"
+MAX_TEXT_BYTES = 2 * 1024 * 1024
 
 
 def find(query: str, limit: int = 10) -> list[dict]:
@@ -57,6 +58,8 @@ def _iter_files():
 
 def _skip(path: Path) -> bool:
     parts = set(path.parts)
+    if any(part.startswith(".") and part not in {".", ".."} for part in path.relative_to(ROOT).parts):
+        return True
     return bool(parts & {".git", ".venv", "__pycache__", "build", "dist"})
 
 
@@ -73,8 +76,10 @@ def _score(text: str, terms: list[str]) -> int:
 
 def _text_match(path: Path, terms: list[str]) -> tuple[str, int]:
     try:
+        if path.stat().st_size > MAX_TEXT_BYTES:
+            return "", 0
         text = path.read_text(encoding="utf-8", errors="ignore")
-    except OSError:
+    except (OSError, ValueError):
         return "", 0
     return _snippet_score(text, terms)
 
