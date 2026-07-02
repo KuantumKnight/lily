@@ -159,6 +159,12 @@ inspect or refresh it manually.
 Use the `runtime_health` tool to check installed Python packages and external
 commands such as `ollama` and `age`.
 
+For a quick non-destructive stabilization check, run:
+
+```powershell
+python scripts/smoke_check.py
+```
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
