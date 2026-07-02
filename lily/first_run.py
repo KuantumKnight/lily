@@ -26,6 +26,8 @@ def check_runtime() -> list[str]:
     """Return human-readable setup warnings. Never raises."""
     warnings: list[str] = []
     warnings.extend(_check_packages())
+    if any("package 'ollama'" in warning for warning in warnings):
+        return warnings
     warnings.extend(_check_ollama_model())
     return warnings
 
