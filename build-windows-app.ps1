@@ -7,6 +7,9 @@ if (-not (Test-Path $python)) {
     throw "Project venv not found. Create it first, then run: pip install -r requirements.txt"
 }
 
+Write-Host "Running smoke checks"
+& $python (Join-Path $root "scripts\smoke_check.py")
+
 $exe = Join-Path $root "dist\Lily\Lily.exe"
 if (Test-Path $exe) {
     Get-CimInstance Win32_Process |
