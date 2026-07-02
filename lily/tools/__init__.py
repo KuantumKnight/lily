@@ -83,6 +83,7 @@ _BUILTIN_MODULES = (
     "focus",
     "git",
     "habits",
+    "health",
     "mode",
     "notes",
     "notifications",
