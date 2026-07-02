@@ -100,9 +100,9 @@ def summary(limit: int = 12) -> str:
 
 def _rating_value(rating: str) -> int:
     lowered = str(rating).strip().lower()
-    if lowered in {"up", "good", "positive", "like", "+", "+1", "thumbs up"}:
+    if lowered in {"up", "good", "positive", "like", "+", "+1", "thumbs up", "👍"}:
         return 1
-    if lowered in {"down", "bad", "negative", "dislike", "-", "-1", "thumbs down"}:
+    if lowered in {"down", "bad", "negative", "dislike", "-", "-1", "thumbs down", "👎"}:
         return -1
     raise ValueError("rating must be up/down or positive/negative")
 
