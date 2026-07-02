@@ -2,17 +2,24 @@
 
 from collections.abc import Iterator
 
-import ollama
-
 from .config import EMBED_MODEL, MODEL, OLLAMA_HOST
 from .log import get_logger
 
 log = get_logger("brain")
-_client = ollama.Client(host=OLLAMA_HOST)
 
 
 class BrainOffline(Exception):
     """Raised when the local model can't be reached or used."""
+
+
+def _client():
+    try:
+        import ollama
+    except ImportError as exc:
+        raise BrainOffline(
+            "Python package 'ollama' is not installed. Run: pip install -r requirements.txt"
+        ) from exc
+    return ollama, ollama.Client(host=OLLAMA_HOST)
 
 
 def embed(text: str) -> list[float]:
@@ -20,13 +27,14 @@ def embed(text: str) -> list[float]:
 
     Raises BrainOffline if Ollama is unreachable or the embed model isn't pulled.
     """
+    ollama, client = _client()
     try:
-        response = _client.embed(model=EMBED_MODEL, input=text)
+        response = client.embed(model=EMBED_MODEL, input=text)
         vectors = response.get("embeddings") or []
         return list(vectors[0]) if vectors else []
     except AttributeError:
         # Older ollama clients expose embeddings() returning a single vector.
-        response = _client.embeddings(model=EMBED_MODEL, prompt=text)
+        response = client.embeddings(model=EMBED_MODEL, prompt=text)
         return list(response.get("embedding") or [])
     except ollama.ResponseError as exc:
         if "not found" in str(exc).lower():
@@ -56,8 +64,9 @@ def chat_once(messages: list[dict], tools: list[dict] | None = None):
 
     Raises BrainOffline on failure.
     """
+    ollama, client = _client()
     try:
-        return _client.chat(model=MODEL, messages=_prepare(messages), tools=tools)["message"]
+        return client.chat(model=MODEL, messages=_prepare(messages), tools=tools)["message"]
     except ollama.ResponseError as exc:
         if "not found" in str(exc).lower():
             log.error("model %s not pulled: %s", MODEL, exc)
@@ -75,8 +84,9 @@ def chat_once(messages: list[dict], tools: list[dict] | None = None):
 
 def stream_chat(messages: list[dict]) -> Iterator[str]:
     """Yield Lily's reply token-by-token. Raises BrainOffline on failure."""
+    ollama, client = _client()
     try:
-        for chunk in _client.chat(model=MODEL, messages=_prepare(messages), stream=True):
+        for chunk in client.chat(model=MODEL, messages=_prepare(messages), stream=True):
             piece = chunk.get("message", {}).get("content", "")
             if piece:
                 yield piece

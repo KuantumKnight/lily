@@ -2,8 +2,6 @@
 
 from importlib.metadata import PackageNotFoundError, version
 
-import ollama
-
 from .config import MODEL, OLLAMA_HOST
 from .log import get_logger
 
@@ -45,6 +43,11 @@ def _check_packages() -> list[str]:
 
 
 def _check_ollama_model() -> list[str]:
+    try:
+        import ollama
+    except ImportError:
+        return ["Missing Python package 'ollama'. Run: pip install -r requirements.txt"]
+
     client = ollama.Client(host=OLLAMA_HOST)
     try:
         response = client.list()

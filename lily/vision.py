@@ -2,18 +2,25 @@
 
 from pathlib import Path
 
-import ollama
-
 from . import screen
 from .config import OLLAMA_HOST, VISION_MODEL
 from .log import get_logger
 
 log = get_logger("vision")
-_client = ollama.Client(host=OLLAMA_HOST)
 
 
 class VisionUnavailable(RuntimeError):
     """Raised when the local vision model cannot be reached or used."""
+
+
+def _client():
+    try:
+        import ollama
+    except ImportError as exc:
+        raise VisionUnavailable(
+            "Python package 'ollama' is not installed. Run: pip install -r requirements.txt"
+        ) from exc
+    return ollama, ollama.Client(host=OLLAMA_HOST)
 
 
 def describe_image(
@@ -26,8 +33,9 @@ def describe_image(
     if not path.exists():
         raise VisionUnavailable(f"image not found: {path}")
 
+    ollama, client = _client()
     try:
-        response = _client.chat(
+        response = client.chat(
             model=VISION_MODEL,
             messages=[
                 {
