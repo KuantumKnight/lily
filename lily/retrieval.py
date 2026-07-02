@@ -58,7 +58,11 @@ def _iter_files():
 
 def _skip(path: Path) -> bool:
     parts = set(path.parts)
-    if any(part.startswith(".") and part not in {".", ".."} for part in path.relative_to(ROOT).parts):
+    try:
+        relative_parts = path.relative_to(ROOT).parts
+    except ValueError:
+        relative_parts = path.parts
+    if any(part.startswith(".") and part not in {".", ".."} for part in relative_parts):
         return True
     return bool(parts & {".git", ".venv", "__pycache__", "build", "dist"})
 
