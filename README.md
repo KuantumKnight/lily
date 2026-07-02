@@ -1,4 +1,5 @@
 # Lily 🌸
+<img width="1536" height="1024" alt="ChatGPT Image Jul 3, 2026, 03_00_30 AM" src="https://github.com/user-attachments/assets/281751e0-88b2-409d-8785-001989927e6c" />
 
 A local-first, open-source **personal AI operating-system layer** — a chief-of-staff that
 lives on your machine, runs on open models, and keeps your data yours.
