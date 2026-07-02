@@ -165,6 +165,12 @@ For a quick non-destructive stabilization check, run:
 .\smoke-check.ps1
 ```
 
+Before cutting a release, run:
+
+```powershell
+.\release-check.ps1
+```
+
 Every request flows through an **orchestrator** that routes it to the right
 agent (type `agents` to see the roster). Anything not claimed by a specialized
 agent falls through to the default conversation agent, so behavior is unchanged
