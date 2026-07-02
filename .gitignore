@@ -23,6 +23,7 @@ Thumbs.db
 .idea/
 .vscode/
 .claude/
+.uv-cache/
 
 # Models / large artifacts
 *.gguf
