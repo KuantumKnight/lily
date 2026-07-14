@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -13,15 +14,13 @@ from scripts import smoke_check
 
 def main() -> int:
     ok = smoke_check.main() == 0
-    roadmap = (ROOT / "ROADMAP.md").read_text(encoding="utf-8")
-    unchecked = [line for line in roadmap.splitlines() if "- [ ]" in line]
-    if unchecked:
-        print("FAIL roadmap has unchecked items:")
-        for line in unchecked:
-            print(line)
-        ok = False
+    suite = unittest.defaultTestLoader.discover(str(ROOT / "tests"))
+    result = unittest.TextTestRunner(verbosity=1).run(suite)
+    if result.wasSuccessful():
+        print(f"ok behavioral tests ({result.testsRun})")
     else:
-        print("ok roadmap complete")
+        print("FAIL behavioral tests")
+        ok = False
     return 0 if ok else 1
 
 
