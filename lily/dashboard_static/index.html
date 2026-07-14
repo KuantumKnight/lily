@@ -8,31 +8,63 @@
 </head>
 <body>
   <header>
-    <h1>Lily</h1>
-    <span id="conn" class="badge">connecting…</span>
+    <div>
+      <h1>Lily</h1>
+      <p>Your private, local assistant</p>
+    </div>
+    <span id="conn" class="badge" role="status">connecting…</span>
   </header>
 
-  <main id="cards">
-    <section class="card" id="card-status">
-      <h2>Status</h2>
-      <div class="body"><span class="muted">loading…</span></div>
+  <main>
+    <section class="chat-shell" aria-labelledby="chat-title">
+      <div class="chat-heading">
+        <div>
+          <span class="eyebrow">Conversation</span>
+          <h2 id="chat-title">What can I help you move forward?</h2>
+        </div>
+        <button id="clear-view" class="quiet" type="button">Clear view</button>
+      </div>
+      <div id="messages" class="messages" aria-live="polite">
+        <div id="empty-chat" class="empty-chat">
+          <span class="orb" aria-hidden="true">✦</span>
+          <p>Ask about your day, a project, or anything on this machine.</p>
+          <div class="suggestions">
+            <button type="button" data-prompt="Give me my daily brief">Daily brief</button>
+            <button type="button" data-prompt="What should I work on next?">What next?</button>
+            <button type="button" data-prompt="What do you remember about my active project?">Project memory</button>
+          </div>
+        </div>
+      </div>
+      <form id="chat-form" class="composer">
+        <label class="sr-only" for="chat-input">Message Lily</label>
+        <textarea id="chat-input" rows="1" maxlength="8000" placeholder="Message Lily…" required></textarea>
+        <button id="send" type="submit" aria-label="Send message">↑</button>
+      </form>
+      <p id="chat-status" class="chat-status" role="status">Local only · your data stays on this machine</p>
     </section>
-    <section class="card" id="card-system">
-      <h2>System</h2>
-      <div class="body"><span class="muted">loading…</span></div>
-    </section>
-    <section class="card" id="card-habits">
-      <h2>Habits</h2>
-      <div class="body"><span class="muted">loading…</span></div>
-    </section>
-    <section class="card" id="card-projects">
-      <h2>Projects</h2>
-      <div class="body"><span class="muted">loading…</span></div>
-    </section>
-    <section class="card" id="card-facts">
-      <h2>Facts</h2>
-      <div class="body"><span class="muted">loading…</span></div>
-    </section>
+
+    <aside id="cards" aria-label="Lily context">
+      <section class="card" id="card-status">
+        <h2>Status</h2>
+        <div class="body"><span class="muted">loading…</span></div>
+      </section>
+      <section class="card" id="card-system">
+        <h2>System</h2>
+        <div class="body"><span class="muted">loading…</span></div>
+      </section>
+      <section class="card" id="card-habits">
+        <h2>Habits</h2>
+        <div class="body"><span class="muted">loading…</span></div>
+      </section>
+      <section class="card" id="card-projects">
+        <h2>Projects</h2>
+        <div class="body"><span class="muted">loading…</span></div>
+      </section>
+      <section class="card" id="card-facts">
+        <h2>Facts</h2>
+        <div class="body"><span class="muted">loading…</span></div>
+      </section>
+    </aside>
   </main>
 
   <script src="/app.js"></script>

@@ -14,6 +14,7 @@ from . import (
     brain,
     brief,
     bus,
+    chat,
     context,
     first_run,
     interrupt,
@@ -22,7 +23,6 @@ from . import (
     mode as mode_module,
     notifications,
     ocr,
-    orchestrator,
     replay,
     retrieval,
     resource_manager,
@@ -35,9 +35,8 @@ from . import (
     vision,
     wake,
 )
-from .config import BARGE_IN, CONTEXT_WINDOW, DASHBOARD_ENABLE, MODEL, PUSH_TO_TALK, TTS_AUTOSPEAK
+from .config import BARGE_IN, DASHBOARD_ENABLE, MODEL, PUSH_TO_TALK, TTS_AUTOSPEAK
 from .log import get_logger
-from .persona import PERSONA
 
 console = Console()
 log = get_logger("cli")
@@ -65,19 +64,8 @@ def _speak(text: str) -> None:
 
 
 def _build_context(user_input: str) -> list[dict]:
-    memory.remember("user", user_input)
-    memory.record_activity("message")
-    system_prompt = PERSONA
-    facts = memory.long_term_context()
-    if facts:
-        system_prompt = f"{system_prompt}\n\n{facts}"
-    project = memory.project_context()
-    if project:
-        system_prompt = f"{system_prompt}\n\n{project}"
-    habits = memory.behavior_summary()
-    if habits:
-        system_prompt = f"{system_prompt}\n\n{habits}"
-    return [{"role": "system", "content": system_prompt}, *memory.recent(CONTEXT_WINDOW)]
+    """Compatibility wrapper for voice mode and third-party callers."""
+    return chat.build_context(user_input)
 
 
 def _print_reminder(row) -> None:
@@ -304,16 +292,14 @@ def _speak_interruptible(text: str) -> bool:
 
 
 def _voice_reply(text: str) -> None:
-    """One spoken turn: build context, think, print, and speak the reply (interruptible)."""
-    messages = _build_context(text)
+    """One spoken turn: think, print, and speak the reply (interruptible)."""
     try:
         with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
-            reply = orchestrator.handle(text, messages)
+            reply = chat.respond(text)
     except brain.BrainOffline as exc:
         console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
         return
     _print_reply(reply)
-    memory.remember("assistant", reply)
     _speak_interruptible(reply)
 
 
@@ -526,17 +512,14 @@ def main() -> None:
             if _agents_command(user_input):
                 continue
 
-            messages = _build_context(user_input)
-
             try:
                 with console.status("[magenta]Lily is thinking…[/]", spinner="dots"):
-                    reply = orchestrator.handle(user_input, messages)
+                    reply = chat.respond(user_input)
             except brain.BrainOffline as exc:
                 console.print(f"[bold red]✗ Lily's brain is offline:[/] {exc}")
                 continue
 
             _print_reply(reply)
-            memory.remember("assistant", reply)
             if _autospeak and reply:
                 _speak(reply)
     finally:

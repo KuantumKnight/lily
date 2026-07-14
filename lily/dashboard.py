@@ -17,7 +17,7 @@ from pathlib import Path
 
 import psutil
 
-from . import adaptive_dashboard, agents, brief, bus, memory
+from . import adaptive_dashboard, agents, brain, brief, bus, chat, memory
 from . import mode as mode_module
 from . import tools
 from .config import DASHBOARD_ADAPTIVE, DASHBOARD_HOST, DASHBOARD_PORT
@@ -163,12 +163,13 @@ def all_cards() -> dict:
 def create_app():
     """Build the FastAPI app. Raises DashboardUnavailable if FastAPI isn't installed."""
     try:
-        from fastapi import FastAPI, WebSocket
+        from fastapi import FastAPI, HTTPException, WebSocket
     except ImportError as exc:
         raise DashboardUnavailable(
             "FastAPI is not installed — run: pip install fastapi uvicorn"
         ) from exc
 
+    chat.prepare()
     app = FastAPI(title="Lily", docs_url=None, redoc_url=None)
 
     @app.get("/api/status")
@@ -198,6 +199,23 @@ def create_app():
     @app.get("/api/cards")
     def _cards():
         return all_cards()
+
+    @app.get("/api/chat/history")
+    def _chat_history(limit: int = 40):
+        return {"messages": memory.recent(max(1, min(limit, 100)))}
+
+    @app.post("/api/chat")
+    def _chat(payload: dict):
+        message = str(payload.get("message") or "").strip()
+        if not message:
+            raise HTTPException(status_code=422, detail="Message cannot be empty.")
+        if len(message) > 8000:
+            raise HTTPException(status_code=422, detail="Message is too long (8,000 character limit).")
+        try:
+            reply = chat.respond(message)
+        except brain.BrainOffline as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        return {"reply": reply}
 
     @app.websocket("/ws")
     async def _ws(websocket: WebSocket):
