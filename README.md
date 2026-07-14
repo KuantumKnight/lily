@@ -48,9 +48,22 @@ Lily runs first-start checks for installed Python packages, Ollama reachability,
 whether the configured model is pulled. Inside the REPL, type `brief` for a local daily
 brief with system status, reminders, notes, and remembered facts.
 
-The Windows desktop app opens a small Lily control window. It can start/open the local
-dashboard, launch the CLI in a separate terminal, and minimizes normally to the Windows
-taskbar. Closing the app window minimizes it; use **Quit** to exit the desktop shell.
+If setup fails—or before the first launch—run the dependency-light diagnostics:
+
+```powershell
+.\lily.ps1 doctor
+# machine-readable output for support or automation
+.\lily.ps1 doctor --json
+```
+
+The doctor checks Python, configuration safety, core and optional packages, writable
+storage, the dashboard port, Ollama and its configured models, microphone input, and
+Piper voice files. Failed checks return a non-zero exit code and include a concrete fix.
+
+The Windows desktop app opens a small Lily control window. Start the local dashboard to
+chat with Lily, see the context she is using, and monitor local system state without a
+terminal. The shell can still launch the CLI for voice and advanced commands. Closing the
+app window minimizes it; use **Quit** to exit the desktop shell.
 
 To build a standalone Windows executable:
 
@@ -164,6 +177,12 @@ For a quick non-destructive stabilization check, run:
 
 ```powershell
 .\smoke-check.ps1
+```
+
+Behavioral tests are included in the release gate and can also be run directly:
+
+```powershell
+python -m unittest discover -s tests -v
 ```
 
 Before cutting a release, run:

@@ -1,110 +1,81 @@
-# Lily — Mega Roadmap 🌸
+# Lily — Product Roadmap
 
-> A local-first, open-source personal AI operating-system layer.
-> **Every checkbox below = one git push.** Check it, push it, move on.
+> Last reset: 2026-07-14. This roadmap tracks evidence that Lily is useful and
+> shippable, not the existence of modules or demos.
 
-Codenames:
-- **v1 Spark** — Easy Prototype (she's alive: text, memory, persona, basic senses)
-- **v2 Voice** — Effort (voice, orchestrator, agents, dashboard, modes)
-- **v3 Prime** — Effort Pro (vision, timeline, encrypted memory, cloud-burst, autonomy)
+## Honest current state
 
-Stack (100% open source, local-first): Ollama · faster-whisper · Piper · openWakeWord ·
-SQLite + sqlite-vec · Textual / FastAPI+Svelte · APScheduler · psutil · GitPython · mss · RapidOCR
+Lily is a broad **feature-complete prototype**, not a finished product. The previous
+roadmap declared success when code for a feature existed. That produced impressive
+breadth—memory, voice, agents, vision, security, and a dashboard—but did not prove
+that a new person could install Lily, trust it, or use it every day.
 
----
+The prototype inventory is preserved in git history. From here on, a checkbox needs
+behavioral tests or user evidence, and release checks do not pass merely because the
+roadmap has no open work.
 
-## v1 — Lily Spark (Easy Prototype)
+## What “we made it” means
 
-### Bring her alive
-- [x] P0  Repo scaffold (README, ROADMAP, LICENSE, .gitignore, package skeleton)
-- [x] P1  Brain online — Ollama client, streaming chat
-- [x] P2  Persona — Lily's voice/personality system prompt
-- [x] P3  Conversation memory (SQLite) — she remembers within a session
-- [x] P4  CLI REPL — talk to Lily in the terminal *(← ALIVE)*
-- [x] P5  Config system (model, host, paths via env + file)
-- [x] P6  Logging + graceful errors (Ollama down, model missing)
+Lily reaches beta when all of these are true:
 
-### Give her senses & hands
-- [x] P7  Tool framework — let Lily call local functions
-- [x] P8  System telemetry tool (psutil: CPU/GPU/RAM/battery/temp)
-- [x] P9  Notes & reminders tool (SQLite-backed)
-- [x] P10 Scheduler (APScheduler) — timed reminders fire
-- [x] P11 Long-term memory — facts/preferences she recalls across sessions
-- [x] P12 Rich TUI polish (panels, markdown rendering, status line)
-- [x] P13 Daily brief command ("Lily, what's up today?")
-- [x] P14 `lily` launcher script + first-run setup (model pull check)
+- A new Windows user can install and reach a first useful answer in under 10 minutes.
+- The desktop app supports the complete daily loop without requiring a terminal.
+- Memory is inspectable, editable, exportable, and recoverable without data loss.
+- Core flows have automated tests and every release artifact passes a clean-machine check.
+- At least five real users use Lily on three separate days in one week and two return the following week.
+- Users can explain one recurring job Lily does better than a normal chat app.
 
----
+## M0 — Make the prototype real
 
-## v2 — Lily Voice (Effort)
+- [x] Put conversation in the dashboard; the desktop surface can now perform Lily's core job.
+- [x] Share one conversation service between CLI and dashboard so memory behavior cannot drift.
+- [x] Add behavioral tests for conversation context, persistence, and the dashboard contract.
+- [x] Make the release check run behavioral tests instead of treating an empty roadmap as proof.
+- [x] Add `lily doctor` with actionable checks for Python, Ollama, models, audio, storage, and ports.
+- [ ] Split core and optional dependencies so text chat does not require the full voice/vision stack.
+- [ ] Replace repository scripts with a one-command Windows installer and uninstaller.
+- [ ] Prove the packaged app on a clean Windows VM and publish the exact compatibility matrix.
 
-### She speaks & listens
-- [x] E0  STT — faster-whisper (speech → text)
-- [x] E1  TTS — Piper (Lily's spoken voice)
-- [x] E2  Wake word — openWakeWord ("Lily")
-- [x] E3  Tier-2 conversation mode (no wake word mid-session)
-- [x] E4  Push-to-talk + barge-in (interrupt her mid-sentence)
+Exit evidence: clean-machine install video, release check output, and a first-answer time under 10 minutes.
 
-### Architecture
-- [x] E5  Orchestrator agent (routes intent → agents)
-- [x] E6  Agent bus (pub/sub, agent registration SDK)
-- [x] E7  Planner agent (multi-step task decomposition)
-- [x] E8  Memory layers: project memory
-- [x] E9  Memory layers: behavior memory (habits, work hours)
-- [x] E10 Vector recall (sqlite-vec embeddings + semantic search)
+## M1 — Build one lovable daily loop
 
-### Modes & interrupts
-- [x] E11 Passive / Active mode switching
-- [x] E12 Resource manager (load/unload models on mode change)
-- [x] E13 Interrupt priority engine (low → emergency)
-- [x] E14 Notification batching (defend focus, no spam)
+- [ ] Make the dashboard the primary app: chat, brief, reminders, projects, and settings in one flow.
+- [ ] Stream responses and show tool activity, cancellation, retry, and useful failure recovery.
+- [ ] Add an onboarding flow that configures a model and demonstrates one real task.
+- [ ] Turn the daily brief into an actionable workspace, not a block of generated text.
+- [ ] Let users create, complete, snooze, and edit reminders from the dashboard.
+- [ ] Measure local opt-in product signals: first answer, repeated use, failures, and feature adoption.
+- [ ] Run five user sessions and choose the single strongest recurring job from evidence.
 
-### Real agents (healthy versions)
-- [x] E15 Dev agent — watch git/terminal, detect build/test failures, suggest fixes
-- [x] E16 Git agent — weekly "what I actually shipped" digest (NOT vanity streaks)
-- [x] E17 Calendar agent — local .ics / CalDAV (open source), conflict + prep reminders
-- [x] E18 Security watchdog — secret-in-clipboard / repo scan (local only)
-- [x] E19 Opportunity agent — RSS/Atom feeds only (CTFTime, conf CFPs), no scraping
+Exit evidence: five weekly users, three-day activation, two week-two returns, and one clearly repeated job.
 
-### Dashboard
-- [x] E20 Dashboard backend (FastAPI, local-only bind)
-- [x] E21 Dashboard UI (static HTML/CSS/JS, no build) — system / work / calendar / security cards
-- [x] E22 Live updates (websocket) + card framework
+## M2 — Earn trust
 
----
+- [ ] Add a memory inspector with edit, forget, export, import, and provenance for every memory.
+- [ ] Add automatic encrypted backups plus a tested restore drill.
+- [ ] Show permission prompts and a durable audit trail before sensitive tools run.
+- [ ] Threat-model localhost APIs, prompt injection, file access, secrets, and model/tool boundaries.
+- [ ] Add schema migrations and rollback tests for every persisted store.
+- [ ] Define retention controls and a true “delete everything” verification flow.
 
-## v3 — Lily Prime (Effort Pro)
+Exit evidence: restore succeeds from a corrupted working database and the security checklist has no open P0/P1 issues.
 
-### Eyes
-- [x] X0  Screen capture (mss) — opt-in, on-demand
-- [x] X1  OCR (RapidOCR) — read text on screen
-- [x] X2  Vision model (llava / qwen-vl via Ollama) — understand UI/errors
-- [x] X3  Context fusion — combine vision + git + active window into "what am I doing"
+## M3 — Private beta
 
-### Memory of a life
-- [x] X4  Timeline store (append-only, chronological)
-- [x] X5  Life replay query ("what was I doing last Thursday?")
-- [x] X6  "Why" memory — capture decisions + reasons, not just events
-- [x] X7  Instant retrieval ("find that PDF about memory hierarchy")
+- [ ] Add crash-safe logs and an explicit, redacted diagnostic bundle.
+- [ ] Version the app, database, config, and release artifacts consistently.
+- [ ] Add signed Windows builds, checksums, release notes, and rollback instructions.
+- [ ] Test upgrade paths from the previous two releases.
+- [ ] Publish limitations and resource requirements without hiding optional-model costs.
+- [ ] Recruit 20 private-beta users and close every activation-blocking issue.
 
-### Security (Lily guards her own hoard)
-- [x] X8  Encrypted memory at rest (SQLCipher / age)
-- [x] X9  Per-agent access audit log
-- [x] X10 Panic-wipe + local key unlock
+Exit evidence: 20 installs, 60% first-week activation, no known data-loss bug, and a reproducible signed release.
 
-### Intelligence & autonomy
-- [x] X11 Cloud-burst reasoning — escalate only hard queries to a frontier API
-- [x] X12 Adaptive dashboard engine (cards appear/vanish by usage)
-- [x] X13 Anti-distraction agent (negotiates, protects focus blocks)
-- [x] X14 Feedback agent (👍/👎 → real preference model, not a counter)
-- [x] X15 Multi-agent coordination (agents collaborate on a goal)
-- [x] X16 Predictive assistance (anticipate next step from patterns)
-- [x] X17 Sleep/Wake full state preservation across reboots
+## Build rules
 
----
-
-### Rules of the build
-1. One checkbox = one focused commit + push.
-2. Every push leaves Lily *runnable* — never commit her broken.
-3. Local-first always. Cloud is opt-in and explicit (X11 only).
-4. Healthy incentives: no vanity-metric gaming, no scraping that breaks ToS.
+1. Ship vertical user outcomes before adding another agent or modality.
+2. A feature is done only with a user-visible flow, failure handling, and proportional tests.
+3. Keep local-first guarantees explicit; cloud use remains opt-in per action.
+4. Never use roadmap completion as a release gate.
+5. Preserve user data across upgrades or block the upgrade safely.
