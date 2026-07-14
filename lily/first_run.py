@@ -23,7 +23,10 @@ REQUIRED_PACKAGES = (
 
 
 def check_runtime() -> list[str]:
-    """Return human-readable setup warnings. Never raises."""
+    """Return human-readable setup warnings. Never raises.
+
+    For a complete actionable report, users can run ``python -m lily doctor``.
+    """
     warnings: list[str] = []
     warnings.extend(_check_packages())
     if any("package 'ollama'" in warning for warning in warnings):

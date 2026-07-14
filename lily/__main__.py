@@ -10,7 +10,12 @@ for _stream in (sys.stdout, sys.stdin, sys.stderr):
     except (AttributeError, ValueError):
         pass
 
-from .cli import main
-
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1].lower() == "doctor":
+        from .doctor import main as doctor_main
+
+        raise SystemExit(doctor_main(sys.argv[2:]))
+
+    from .cli import main
+
     main()
