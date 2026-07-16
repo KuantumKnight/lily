@@ -13,13 +13,15 @@ file is the single app extended across all three.
 import asyncio
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 
 import psutil
 
-from . import adaptive_dashboard, agents, brain, brief, bus, chat, memory
+from . import adaptive_dashboard, agents, brain, brief, bus, chat, goals, memory, timeline
 from . import mode as mode_module
 from . import tools
+from .agents import planner as planner_agent
 from .config import DASHBOARD_ADAPTIVE, DASHBOARD_HOST, DASHBOARD_PORT
 from .log import get_logger
 
@@ -70,6 +72,110 @@ def status_card() -> dict:
     }
 
 
+def profile_card() -> dict:
+    """Return the operating profile Lily should present in the dashboard.
+
+    Profiles are the product language above the existing passive/active resource
+    switch. Until richer profile automation exists, the current mode is the
+    source of truth and the extra profiles are surfaced as available intents.
+    """
+    current = mode_module.current()
+    profiles = [
+        {
+            "name": "Passive",
+            "key": "passive",
+            "summary": "Wake word and watchdogs only.",
+            "enabled": ["Wake", "Security"],
+        },
+        {
+            "name": "Active",
+            "key": "active",
+            "summary": "Reasoning, memory, agents, and automation available.",
+            "enabled": ["Voice", "Memory", "Agents", "Dashboard"],
+        },
+        {
+            "name": "Deep Work",
+            "key": "deep_work",
+            "summary": "Distractions batched while goal work stays visible.",
+            "enabled": ["Focus", "Timeline", "Notifications"],
+        },
+        {
+            "name": "Coding",
+            "key": "coding",
+            "summary": "Repository, terminal, git, and error context first.",
+            "enabled": ["Git", "Dev", "Timeline"],
+        },
+        {
+            "name": "Research",
+            "key": "research",
+            "summary": "Reading, PDF analysis, and knowledge capture.",
+            "enabled": ["Research", "Memory", "Recall"],
+        },
+    ]
+    return {"current": current, "profiles": profiles}
+
+
+def goal_card() -> dict:
+    """Return the active persisted goal plus a compact goal queue."""
+    active = goals.active_goal()
+    all_goals = goals.list_goals(limit=8)
+    queue = [
+        {
+            "id": item["id"],
+            "title": item["title"],
+            "status": item["status"],
+            "progress": item["progress"],
+            "priority": item["priority"],
+        }
+        for item in all_goals
+        if not active or item["id"] != active["id"]
+    ]
+
+    if active:
+        recent = goals.recent_events(active["id"], limit=1)
+        last_worked = (
+            datetime.fromtimestamp(recent[0]["ts"]).strftime("%Y-%m-%d %H:%M")
+            if recent else ""
+        )
+        return {
+            "id": active["id"],
+            "goal": active["title"],
+            "outcome": active["outcome"],
+            "success_criteria": active["success_criteria"],
+            "status": active["status"],
+            "priority": active["priority"],
+            "due_at": active["due_at"],
+            "progress": active["progress"],
+            "blocker": active["blocker"],
+            "next_action": active["next_action"],
+            "last_worked": last_worked,
+            "tasks": active["tasks"],
+            "task_summary": active["task_summary"],
+            "queue": queue,
+            "suggestions": [
+                f"Continue {active['title']}",
+                f"Plan the next steps for {active['title']}",
+                "Open daily brief",
+            ],
+        }
+
+    # Preserve installations that used state keys before goals were first-class.
+    legacy_goal = memory.get_state("active_goal", "") or memory.active_project()
+    return {
+        "id": None,
+        "goal": legacy_goal,
+        "status": "legacy" if legacy_goal else "empty",
+        "progress": memory.get_state("active_goal_progress", ""),
+        "blocker": memory.get_state("active_goal_blocker", ""),
+        "next_action": "",
+        "last_worked": memory.get_state("active_goal_last_worked", ""),
+        "tasks": [],
+        "task_summary": {"total": 0, "done": 0, "blocked": 0, "remaining": 0},
+        "queue": queue,
+        "suggestions": ["Open daily brief", "Ask what next"],
+    }
+
+
 def habits_card() -> dict:
     window = memory.work_hours()
     return {
@@ -91,6 +197,30 @@ def brief_card() -> dict:
     return {"brief": brief.daily_brief()}
 
 
+def timeline_card(limit: int = 6) -> dict:
+    events = []
+    for event in timeline.recent(limit):
+        events.append(
+            {
+                "id": event["id"],
+                "ts": event["ts"],
+                "time": datetime.fromtimestamp(event["ts"]).strftime("%H:%M"),
+                "kind": event["kind"],
+                "title": event["title"],
+                "content": event["content"],
+            }
+        )
+    return {"events": events}
+
+
+def agents_card() -> dict:
+    roster = [
+        {"name": agent.name, "description": agent.description}
+        for agent in agents.all_agents()
+    ]
+    return {"agents": roster}
+
+
 # ---- live websocket bridge (E22) ----------------------------------------------
 
 # Bus topics worth pushing to the browser. Each nudges the client to refresh its cards.
@@ -98,6 +228,8 @@ _LIVE_TOPICS = {
     "mode.changed", "lily.reply", "reminder.fired", "notification.surfaced",
     "notification.queued", "work.digest", "dev.tests", "plan.created",
     "calendar.upcoming", "opportunities.found", "interrupt.raised",
+    "goal.created", "goal.updated", "goal.task_added", "goal.task_updated",
+    "goal.planned",
 }
 
 
@@ -150,7 +282,11 @@ def all_cards() -> dict:
     """Every card the UI renders, in one payload (used by /api/cards and the websocket)."""
     cards = {
         "status": status_card(),
+        "profile": profile_card(),
+        "goal": goal_card(),
         "system": system_card(),
+        "timeline": timeline_card(),
+        "agents": agents_card(),
         "habits": habits_card(),
         "facts": memory_facts_card(10),
         "projects": memory_projects_card(),
@@ -195,6 +331,99 @@ def create_app():
     @app.get("/api/brief")
     def _brief():
         return brief_card()
+
+    def _goal_failure(exc: Exception):
+        status_code = 404 if isinstance(exc, KeyError) else 422
+        detail = exc.args[0] if exc.args else str(exc)
+        raise HTTPException(status_code=status_code, detail=str(detail)) from exc
+
+    @app.get("/api/goals")
+    def _goals(status: str = "", limit: int = 20):
+        try:
+            return {"goals": goals.list_goals(status=status, limit=limit)}
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.post("/api/goals")
+    def _create_goal(payload: dict):
+        try:
+            return goals.create_goal(
+                title=payload.get("title", ""),
+                outcome=payload.get("outcome", ""),
+                success_criteria=payload.get("success_criteria", ""),
+                priority=payload.get("priority", 3),
+                due_at=payload.get("due_at", ""),
+                next_action=payload.get("next_action", ""),
+                activate=bool(payload.get("activate", True)),
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.get("/api/goals/{goal_id}")
+    def _goal(goal_id: int):
+        try:
+            return goals.get_goal(goal_id)
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.patch("/api/goals/{goal_id}")
+    def _update_goal(goal_id: int, payload: dict):
+        try:
+            return goals.update_goal(goal_id, **payload)
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.post("/api/goals/{goal_id}/activate")
+    def _activate_goal(goal_id: int):
+        try:
+            return goals.set_active(goal_id)
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.post("/api/goals/{goal_id}/tasks")
+    def _create_goal_task(goal_id: int, payload: dict):
+        try:
+            return goals.add_task(
+                goal_id,
+                title=payload.get("title", ""),
+                assignee=payload.get("assignee", ""),
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.post("/api/goals/{goal_id}/plan")
+    def _plan_goal(goal_id: int):
+        try:
+            goal = goals.get_goal(goal_id)
+            context = [f"Goal: {goal['title']}"]
+            if goal["outcome"]:
+                context.append(f"Desired outcome: {goal['outcome']}")
+            if goal["success_criteria"]:
+                context.append(f"Success criteria: {goal['success_criteria']}")
+            context.append(
+                "Create concrete execution tasks. Do not repeat work already implied "
+                "by the goal wording."
+            )
+            steps = planner_agent.plan("\n".join(context))
+            return goals.add_generated_tasks(goal_id, steps)
+        except brain.BrainOffline as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.patch("/api/goals/{goal_id}/tasks/{task_id}")
+    def _update_goal_task(goal_id: int, task_id: int, payload: dict):
+        try:
+            return goals.update_task(goal_id, task_id, **payload)
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
+
+    @app.get("/api/goals/{goal_id}/events")
+    def _goal_events(goal_id: int, limit: int = 20):
+        try:
+            return {"events": goals.recent_events(goal_id, limit=limit)}
+        except (KeyError, TypeError, ValueError) as exc:
+            _goal_failure(exc)
 
     @app.get("/api/cards")
     def _cards():

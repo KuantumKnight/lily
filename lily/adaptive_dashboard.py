@@ -1,6 +1,6 @@
 """Adaptive dashboard card selection."""
 
-ALWAYS_ON = {"status", "system"}
+ALWAYS_ON = {"status", "profile", "goal", "system", "timeline", "agents"}
 
 
 def select(cards: dict) -> dict:

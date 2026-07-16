@@ -3,69 +3,182 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lily</title>
+  <title>SentinelOS</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Lily</h1>
-      <p>Your private, local assistant</p>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <h1>SentinelOS</h1>
+        <p>Lily local operating layer</p>
+      </div>
     </div>
-    <span id="conn" class="badge" role="status">connecting…</span>
+    <div class="topbar-actions">
+      <span id="conn" class="badge" role="status">connecting...</span>
+    </div>
   </header>
 
-  <main>
-    <section class="chat-shell" aria-labelledby="chat-title">
+  <main class="os-grid">
+    <section class="workspace" aria-labelledby="dashboard-title">
+      <div class="workspace-head">
+        <div>
+          <span class="eyebrow">Dashboard</span>
+          <h2 id="dashboard-title">Good Morning, Sarvesh</h2>
+        </div>
+        <div class="system-layer" aria-label="SentinelOS layer">
+          <span>Voice</span>
+          <span>Vision</span>
+          <span>Memory</span>
+          <span>Agents</span>
+          <span>Timeline</span>
+          <span>Security</span>
+        </div>
+      </div>
+
+      <div class="summary-grid" aria-label="Operating summary">
+        <article class="summary-cell">
+          <span>Current Goal</span>
+          <strong id="summary-goal">loading...</strong>
+        </article>
+        <article class="summary-cell">
+          <span>Profile</span>
+          <strong id="summary-profile">loading...</strong>
+        </article>
+        <article class="summary-cell">
+          <span>Agents</span>
+          <strong id="summary-agents">loading...</strong>
+        </article>
+        <article class="summary-cell">
+          <span>Local State</span>
+          <strong id="summary-local">private</strong>
+        </article>
+      </div>
+
+      <div id="cards" class="cards-grid" aria-label="Lily context">
+        <section class="card goal-card" id="card-goal">
+          <div class="card-head">
+            <h2>Goal Engine</h2>
+            <button id="new-goal" class="quiet compact-button" type="button">New goal</button>
+          </div>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card" id="card-profile">
+          <h2>Profiles</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card timeline-card" id="card-timeline">
+          <h2>Timeline</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card" id="card-system">
+          <h2>System</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card" id="card-agents">
+          <h2>Agents</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card" id="card-projects">
+          <h2>Projects</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card" id="card-habits">
+          <h2>Habits</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card" id="card-facts">
+          <h2>Memory</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+        <section class="card compact" id="card-status">
+          <h2>Status</h2>
+          <div class="body"><span class="muted">loading...</span></div>
+        </section>
+      </div>
+    </section>
+
+    <aside class="command-panel" aria-labelledby="chat-title">
       <div class="chat-heading">
         <div>
-          <span class="eyebrow">Conversation</span>
-          <h2 id="chat-title">What can I help you move forward?</h2>
+          <span class="eyebrow">Command Surface</span>
+          <h2 id="chat-title">What goal should move?</h2>
         </div>
-        <button id="clear-view" class="quiet" type="button">Clear view</button>
+        <button id="clear-view" class="quiet" type="button">Clear</button>
       </div>
       <div id="messages" class="messages" aria-live="polite">
         <div id="empty-chat" class="empty-chat">
-          <span class="orb" aria-hidden="true">✦</span>
-          <p>Ask about your day, a project, or anything on this machine.</p>
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <p>Ask Lily for a daily brief, a timeline replay, or the next move on your current goal.</p>
           <div class="suggestions">
             <button type="button" data-prompt="Give me my daily brief">Daily brief</button>
             <button type="button" data-prompt="What should I work on next?">What next?</button>
-            <button type="button" data-prompt="What do you remember about my active project?">Project memory</button>
+            <button type="button" data-prompt="What did I work on recently?">Timeline</button>
           </div>
         </div>
       </div>
       <form id="chat-form" class="composer">
         <label class="sr-only" for="chat-input">Message Lily</label>
-        <textarea id="chat-input" rows="1" maxlength="8000" placeholder="Message Lily…" required></textarea>
-        <button id="send" type="submit" aria-label="Send message">↑</button>
+        <textarea id="chat-input" rows="1" maxlength="8000" placeholder="Give Lily a goal..." required></textarea>
+        <button id="send" type="submit" aria-label="Send message">></button>
       </form>
-      <p id="chat-status" class="chat-status" role="status">Local only · your data stays on this machine</p>
-    </section>
-
-    <aside id="cards" aria-label="Lily context">
-      <section class="card" id="card-status">
-        <h2>Status</h2>
-        <div class="body"><span class="muted">loading…</span></div>
-      </section>
-      <section class="card" id="card-system">
-        <h2>System</h2>
-        <div class="body"><span class="muted">loading…</span></div>
-      </section>
-      <section class="card" id="card-habits">
-        <h2>Habits</h2>
-        <div class="body"><span class="muted">loading…</span></div>
-      </section>
-      <section class="card" id="card-projects">
-        <h2>Projects</h2>
-        <div class="body"><span class="muted">loading…</span></div>
-      </section>
-      <section class="card" id="card-facts">
-        <h2>Facts</h2>
-        <div class="body"><span class="muted">loading…</span></div>
-      </section>
+      <p id="chat-status" class="chat-status" role="status">Local only. Your data stays on this machine.</p>
     </aside>
   </main>
+
+  <dialog id="goal-dialog" class="goal-dialog" aria-labelledby="goal-dialog-title">
+    <form id="goal-form">
+      <div class="dialog-head">
+        <div>
+          <span class="eyebrow">Goal Engine</span>
+          <h2 id="goal-dialog-title">Create goal</h2>
+        </div>
+        <button class="icon-button" type="button" data-close-goal aria-label="Close goal editor">x</button>
+      </div>
+      <input id="goal-id" name="id" type="hidden" />
+      <label>
+        <span>Goal</span>
+        <input id="goal-title" name="title" maxlength="180" required placeholder="Ship the SentinelOS beta" />
+      </label>
+      <label>
+        <span>Outcome</span>
+        <textarea id="goal-outcome" name="outcome" rows="2" maxlength="1000" placeholder="What will be true when this succeeds?"></textarea>
+      </label>
+      <label>
+        <span>Success criteria</span>
+        <textarea id="goal-success" name="success_criteria" rows="2" maxlength="1000" placeholder="How will Sentinel know it is done?"></textarea>
+      </label>
+      <label>
+        <span>Next action</span>
+        <input id="goal-next-action" name="next_action" maxlength="300" placeholder="The smallest useful next move" />
+      </label>
+      <label>
+        <span>Blocker</span>
+        <input id="goal-blocker" name="blocker" maxlength="300" placeholder="Leave empty when unblocked" />
+      </label>
+      <div class="form-grid">
+        <label>
+          <span>Due date</span>
+          <input id="goal-due" name="due_at" type="date" />
+        </label>
+        <label>
+          <span>Priority</span>
+          <select id="goal-priority" name="priority">
+            <option value="1">Critical</option>
+            <option value="2">High</option>
+            <option value="3" selected>Normal</option>
+            <option value="4">Low</option>
+            <option value="5">Someday</option>
+          </select>
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button class="quiet" type="button" data-close-goal>Cancel</button>
+        <button class="primary-action" type="submit">Save goal</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="/app.js"></script>
   <script src="/card.js"></script>
